@@ -1,0 +1,51 @@
+# DSP → renderer integration review
+
+Reviewed October 10, 2026 against specification sections 8–12, 14 and 16. Scope: analysis output timing, `AnalysisStore`, canvas renderers, render scheduling and measurement geometry. No random signal substitutes were introduced.
+
+## Confirmed bugs and fixes
+
+| Reproduced failure                                                                           | Corrected behavior                                                                                                                                                | Regression evidence                                                                                            |
+| -------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| PCM gaps reset Worker windows while main retained old stereo points and scope trails         | A gap clears short persistence state before accepting the new segment; long waveform/spectral histories remain separated by their gap markers                     | Gap fixture retains only the new pair and new scope frame                                                      |
+| Scope trails accumulated only when the renderer ran                                          | Main retains accepted scope frames, so 30 FPS, focus and offscreen rendering do not discard pending snapshots                                                     | Five accepted default-rate frames remain available before any render                                           |
+| Stereo rows stayed in the fixed ring until wrap even after their opacity expired             | Main advances the logical oldest row at the configured visual-age horizon; renderer iterates only retained rows                                                   | Zero-persistence 20 ms window removes a one-second-old pair                                                    |
+| De-duplication by Float32 visual time erased different samples in long sessions              | Duplicate result batches are rejected using their captured latest-frame index; equal rounded row timestamps remain valid                                          | Distinct 3600-second sample timestamps survive Float32 rounding; replaying the same result does not add points |
+| A fixed 60-frame scope limit truncated persistence at high PCM rates                         | Scope trails choose the latest accepted frame in each fixed, sample-derived 20 ms visual-time bucket; current scope still updates on every result                 | 192 kHz/1024-frame packets retain the complete 200 ms × ln(255) decay horizon with ≤57 trail frames            |
+| Each waveform bucket occupied only its endpoint pixel, leaving holes at short horizons       | Buckets cover their recorded intervals. Extrema are preserved; RMS combines energy/count weighted by interval overlap. No samples or finer detail are synthesized | A measured 2 ms bucket spans four 0.5 ms pixels with the same extrema/RMS; a missing interval stays empty      |
+| Gap pixels were skipped entirely, removing the first bucket's peaks                          | Outlines restart at a gap pixel while retaining its measured extrema                                                                                              | The first post-gap impulse remains in projected extrema                                                        |
+| Scope reduction ignored fractional pixel boundaries                                          | Each pixel includes every interior captured value and interpolated boundary amplitudes                                                                            | Positive/negative impulses and fractional endpoints are preserved                                              |
+| Spectrogram slices had zero-width time supports                                              | Worker records half-hop support on either side of each contributing STFT center; adjacent continuous supports touch                                               | Default supports are 1024/48000 seconds wide; original 2047.5-frame center stays unchanged                     |
+| Sweep raster wrap, gap markers and tooltips used inconsistent mappings                       | Shared geometry splits wrap intervals and maps a pointer to the newest available captured cycle                                                                   | 7.98–8.02 s splits across an 8 s wrap; pointer 0.2 at 10 s identifies 9.6 s                                    |
+| Spectrogram tooltips borrowed a nearby slice across missing history                          | Tooltips require the pointer time to belong to a recorded support interval                                                                                        | A pointer outside the support reports unavailable history                                                      |
+| Spectrum tooltips measured the nearest bin even when the pixel displayed a different maximum | Rendering and measurement use the same pixel bucket, raw maximum power, source-bin range and interpolation flag                                                   | A rendered pixel containing −20 and −6.02 dBFS bins reports the −6.02 dBFS maximum                             |
+| Spectrogram fading mixed an old loud code with the age of a newer quiet slice                | Each stored measurement is faded before maximum displayed-intensity aggregation                                                                                   | A two-second-old 0 dBFS slice keeps exp(−2) intensity despite newer floor-level data in the same pixel         |
+| ResizeObserver bypassed the configured render cadence                                        | Resize marks the scheduler dirty; drawing remains on the visibility/focus-aware paced animation frame                                                             | TypeScript/build verification; browser cadence remains a separate measurement                                  |
+
+Frequency projections retain the original one-Uint16-array-per-slice cache; tooltip source selection is computed on demand rather than adding another retained source-index array. Filtered band contours and auxiliary strips also restart their paths at gaps.
+
+## Timing, history and memory contracts
+
+Stereo receives only new Worker-selected rows, at ≤24 paired samples per absolute 1 ms bucket on desktop or ≤12 in mobile/economy mode. Main inserts each result batch once. A point has full opacity through its configured point window, then `exp(-(age-window)/tau)` until below 1/255; zero persistence performs no division. Ages use the frozen/advancing visual timeline, independent of draw count.
+
+The 72,000 × 9 Float32 stereo pool remains a fixed 2,592,000-byte allocation. Logical pruning avoids scanning expired rows and does not allocate another point pool. Scope trails are capped at 60 frames and at their configured decay horizon, with fixed 20 ms selection. At supported 192 kHz, four 40 Hz cycles require at most 19,201 values per frame; the complete maximum decay horizon uses at most approximately 57 such arrays (~4.2 MiB). The current scope references its retained value array instead of copying it.
+
+Spectrogram `time` remains a contributing STFT center. Its `start/end` interval is the union of those centers' hop supports for display placement, not a claim of narrower FFT time resolution. The FFT window remains N/Fs seconds. The tooltip's interval describes this recorded display support. Stored frequency-bucket edges and interpolated flags remain unchanged; reprojection cannot create new resolution.
+
+Waveform expansion repeats measured bucket statistics over their recorded interval. Pixel-overlap weighting is a rendering estimate inside a bucket, while tooltips report the actual original bucket min/max/count/RMS and duration. Missing PCM never becomes zero-valued history.
+
+## Verification
+
+Fresh commands after final source changes:
+
+- `npm test -- tests/dsp --reporter=dot`: **54 tests passed** across numerical DSP, Worker boundaries/ownership and renderer/store regressions.
+- `npm run build`: **passed**, including TypeScript and the production Vite bundle.
+
+Canvas-boundary tests run the actual renderer against a deterministic minimal canvas context and inspect emitted raster data/measurements. They verify numerical and mapping behavior, not browser antialiasing or visual appearance. Browser screenshots, supported-browser codec checks, the 60-second device performance run and the 10-minute/20-switch ownership soak are owned by the broader integration verification.
+
+An earlier all-suite run during concurrent settings work observed two failures in `tests/integration/storage.test.ts` (preset restore truncation and future-envelope acceptance). Those files were outside this review's ownership and were reported to the parent agent; this document does not claim their final status.
+
+## Final performance and cleanup pass
+
+Spectrogram reprojection uses a lazily allocated 65,536-entry intensity lookup keyed by floor, ceiling, gamma and trim. Retained raw codes and measured tooltip values remain unchanged; per-slice sample-time fade still precedes pixel aggregation. Stereo rendering composites each retained measured point in full-DPR 512×512 tiles, including fractional coverage and source-over overlap, then transfers the resulting raster to Canvas. It does not decimate pairs, reduce DPR or substitute animated geometry. Renderer teardown releases typed lookup/cell/alpha storage and offscreen backing dimensions.
+
+The final root verification passed 107 tests across eleven files, including five stereo-raster regressions, and compiled the production bundle. The isolated 1920×1080/DPR2 run measured 59.88 median FPS, 8.6 ms p95 render duration and 26.69 ms p95 latest-sample latency. Final machine-readable measurements and cross-browser integration evidence live in VERIFICATION.md and docs/verification; historic findings above are repaired and do not replace those final results.

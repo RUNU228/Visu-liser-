@@ -1,0 +1,38 @@
+{
+  "browser": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36",
+  "viewport": {
+    "width": 1920,
+    "height": 1080,
+    "dpr": 2
+  },
+  "durationSeconds": 60,
+  "sampleRate": 48000,
+  "buckets": 1024,
+  "reservedBytes": 25352432,
+  "historyBytes": 2715776,
+  "gaps": 2,
+  "latencyMedian": 18.687499999998636,
+  "latencyP95": 26.687500000001307,
+  "latencyMax": 53.35416666666504,
+  "centerAgeP95": 69.34375000000159,
+  "fps": 59.88023952095548,
+  "renderP95": 8.599999997764826,
+  "samples": 2806,
+  "contextState": "running",
+  "baseLatency": 0.01,
+  "outputLatency": 0.04,
+  "primary": true,
+  "sessionId": 3,
+  "epoch": 1,
+  "capturing": true,
+  "effective": {
+    "fps": 60,
+    "dpr": 2
+  },
+  "canvasBytes": 14014960,
+  "offscreenCanvasBytes": 2360416,
+  "heap": {
+    "used": 48208886,
+    "total": 83544878
+  }
+}

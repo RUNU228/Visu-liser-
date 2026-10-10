@@ -1,0 +1,53 @@
+{
+  "browser": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36",
+  "rows": [
+    {
+      "file": "stereo16.wav",
+      "metadata": "ready",
+      "playback": true,
+      "primary": true
+    },
+    {
+      "file": "stereo24.wav",
+      "metadata": "ready",
+      "playback": true,
+      "primary": true
+    },
+    {
+      "file": "stereo.mp3",
+      "metadata": "ready",
+      "playback": true,
+      "primary": true
+    },
+    {
+      "file": "stereo.flac",
+      "metadata": "ready",
+      "playback": true,
+      "primary": true
+    },
+    {
+      "file": "stereo.m4a",
+      "metadata": "ready",
+      "playback": true,
+      "primary": true
+    },
+    {
+      "file": "stereo.ogg",
+      "metadata": "ready",
+      "playback": true,
+      "primary": true
+    },
+    {
+      "file": "stereo.opus.ogg",
+      "metadata": "ready",
+      "playback": true,
+      "primary": true
+    },
+    {
+      "file": "stereo.webm",
+      "metadata": "ready",
+      "playback": true,
+      "primary": true
+    }
+  ]
+}

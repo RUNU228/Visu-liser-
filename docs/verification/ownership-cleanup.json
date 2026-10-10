@@ -1,0 +1,59 @@
+{
+  "browser": "155.0.8059.39",
+  "baseline": {
+    "heap": {
+      "usedSize": 3833656,
+      "totalSize": 6438912,
+      "embedderHeapUsedSize": 1961328,
+      "backingStorageSize": 5796073
+    },
+    "owners": {
+      "urls": 0,
+      "queue": 0,
+      "undo": false,
+      "history": 0
+    }
+  },
+  "peak": {
+    "heap": {
+      "usedSize": 120561228,
+      "totalSize": 184029184,
+      "embedderHeapUsedSize": 6622784,
+      "backingStorageSize": 31888008
+    },
+    "owners": {
+      "urls": 20,
+      "queue": 20,
+      "undo": false,
+      "history": 16384
+    }
+  },
+  "cleared": {
+    "heap": {
+      "usedSize": 6027728,
+      "totalSize": 7036928,
+      "embedderHeapUsedSize": 2086440,
+      "backingStorageSize": 7827361
+    },
+    "owners": {
+      "urls": 0,
+      "queue": 0,
+      "undo": false,
+      "history": 0
+    }
+  },
+  "destroyed": {
+    "heap": {
+      "usedSize": 6018616,
+      "totalSize": 6774784,
+      "embedderHeapUsedSize": 2058320,
+      "backingStorageSize": 4717753
+    },
+    "owners": {
+      "urls": 0,
+      "queue": 0,
+      "undo": false,
+      "history": 0
+    }
+  }
+}
