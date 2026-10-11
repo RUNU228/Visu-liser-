@@ -5,7 +5,7 @@ export function timeLabel(seconds: number) {
   return `${Math.floor(seconds / 60)}:${String(Math.floor(seconds % 60)).padStart(2, "0")}`;
 }
 export function frequencyLabel(hz: number) {
-  return hz >= 1000 ? `${+(hz / 1000).toFixed(1)} кГц` : `${Math.round(hz)} Гц`;
+  return hz >= 1000 ? `${+(hz / 1000).toFixed(1)} kHz` : `${Math.round(hz)} Hz`;
 }
 export function frequencyPosition(
   hz: number,
@@ -54,5 +54,5 @@ export function noteLabel(hz: number) {
     "A♯",
     "B",
   ];
-  return `${names[((nearest % 12) + 12) % 12]}${Math.floor(nearest / 12) - 1} ${Math.round((midi - nearest) * 100) >= 0 ? "+" : ""}${Math.round((midi - nearest) * 100)} центов`;
+  return `${names[((nearest % 12) + 12) % 12]}${Math.floor(nearest / 12) - 1} ${Math.round((midi - nearest) * 100) >= 0 ? "+" : ""}${Math.round((midi - nearest) * 100)} cents`;
 }

@@ -1,4 +1,6 @@
 import type { CSSProperties } from "react";
+import wordmark from "../assets/wordmark.svg?raw";
+const wordmarkMarkup = wordmark.replace("<svg ", '<svg aria-hidden="true" ');
 const paths: Record<string, string> = {
   play: "M8 5v14l11-7z",
   pause: "M8 5v14M16 5v14",
@@ -43,29 +45,11 @@ export function Icon({ name, style }: { name: string; style?: CSSProperties }) {
 }
 export function Logo() {
   return (
-    <svg
+    <span
       className="logo"
       role="img"
       aria-label="Visu@lizer"
-      viewBox="0 0 240 50"
-    >
-      <text
-        x="0"
-        y="36"
-        fill="currentColor"
-        fontFamily="Inter Variable, sans-serif"
-        fontSize="34"
-        fontWeight="650"
-        letterSpacing="-1.8"
-      >
-        Visu<tspan fontWeight="400">@</tspan>lizer
-      </text>
-      <path
-        d="M76 39h19"
-        stroke="currentColor"
-        strokeWidth="1"
-        transform="translate(2,0)"
-      />
-    </svg>
+      dangerouslySetInnerHTML={{ __html: wordmarkMarkup }}
+    />
   );
 }

@@ -14,11 +14,9 @@ test("real local playback drives all five modules and survives transport boundar
     ]);
   await expect(page.getByText("stereo16", { exact: true })).toBeVisible();
   await expect(
-    page.getByRole("button", { name: "Воспроизвести", exact: true }),
+    page.getByRole("button", { name: "Play", exact: true }),
   ).toBeEnabled();
-  await page
-    .getByRole("button", { name: "Воспроизвести", exact: true })
-    .click();
+  await page.getByRole("button", { name: "Play", exact: true }).click();
   await expect
     .poll(() =>
       page.evaluate(() => {
@@ -44,10 +42,12 @@ test("real local playback drives all five modules and survives transport boundar
       scope: true,
     });
   await page.screenshot({
-    path: `docs/screenshots/${test.info().project.name}-playing-1440.png`,
+    path: test
+      .info()
+      .outputPath(`${test.info().project.name}-playing-1440.png`),
     fullPage: true,
   });
-  await page.getByRole("button", { name: "Пауза", exact: true }).click();
+  await page.getByRole("button", { name: "Pause", exact: true }).click();
   const paused = await page.evaluate(
     () => (window as any).visualizer.controller.audio.store.time,
   );
@@ -57,9 +57,7 @@ test("real local playback drives all five modules and survives transport boundar
       () => (window as any).visualizer.controller.audio.store.time,
     ),
   ).toBe(paused);
-  await page
-    .getByRole("button", { name: "Воспроизвести", exact: true })
-    .click();
+  await page.getByRole("button", { name: "Play", exact: true }).click();
   await expect
     .poll(() =>
       page.evaluate(
@@ -67,9 +65,7 @@ test("real local playback drives all five modules and survives transport boundar
       ),
     )
     .toBeGreaterThan(paused);
-  await page
-    .getByRole("button", { name: "Отключить звук", exact: true })
-    .click();
+  await page.getByRole("button", { name: "Mute", exact: true }).click();
   await expect
     .poll(() =>
       page.evaluate(
@@ -87,9 +83,7 @@ test("real local playback drives all five modules and survives transport boundar
       ),
     )
     .toBe(true);
-  await page
-    .getByRole("button", { name: "Следующая дорожка", exact: true })
-    .click();
+  await page.getByRole("button", { name: "Next track", exact: true }).click();
   await expect(page.getByText("stereo24", { exact: true })).toBeVisible();
   await expect
     .poll(() =>
@@ -110,14 +104,16 @@ test("responsive layouts, settings modal, persistence and queue undo", async ({
       await page.evaluate(() => document.documentElement.scrollWidth),
     ).toBeLessThanOrEqual(width);
     await page.screenshot({
-      path: `docs/screenshots/${test.info().project.name}-empty-${width}.png`,
+      path: test
+        .info()
+        .outputPath(`${test.info().project.name}-empty-${width}.png`),
       fullPage: true,
     });
   }
-  await page.getByRole("button", { name: "Настройки", exact: true }).click();
+  await page.getByRole("button", { name: "Settings", exact: true }).click();
   await expect(page.getByRole("dialog")).toBeVisible();
   await page.getByRole("button", { name: "Night Trace", exact: true }).click();
-  await page.getByRole("button", { name: "Закрыть панель" }).click();
+  await page.getByRole("button", { name: "Close panel" }).click();
   expect(await page.locator("html").getAttribute("data-theme")).toBe("dark");
   await page.reload();
   expect(await page.locator("html").getAttribute("data-theme")).toBe("dark");
@@ -126,14 +122,12 @@ test("responsive layouts, settings modal, persistence and queue undo", async ({
     .first()
     .setInputFiles("tests/fixtures/stereo16.wav");
   await expect(page.getByText("stereo16", { exact: true })).toBeVisible();
-  await page.getByRole("button", { name: /Очередь, 1/ }).click();
+  await page.getByRole("button", { name: /Queue, 1/ }).click();
+  await page.getByRole("button", { name: "Clear queue", exact: true }).click();
   await page
-    .getByRole("button", { name: "Очистить очередь", exact: true })
+    .getByRole("button", { name: "Undo clear · 5 s", exact: true })
     .click();
-  await page
-    .getByRole("button", { name: "Отменить очистку · 5 с", exact: true })
-    .click();
-  await page.getByRole("button", { name: "Закрыть панель" }).click();
+  await page.getByRole("button", { name: "Close panel" }).click();
   await expect(page.getByText("stereo16", { exact: true })).toBeVisible();
   expect(
     await page.evaluate(

@@ -14,16 +14,7 @@ import { timeLabel } from "../shared/units";
 import { Icon } from "./icons";
 import { names } from "./Plot";
 import type { RenderScheduler } from "../visualizers/scheduler";
-const transportNames = {
-  empty: "Пусто",
-  ready: "Готово",
-  playing: "Воспроизведение",
-  paused: "Пауза",
-  interrupted: "Аудио прервано",
-  buffering: "Буферизация",
-  ended: "Завершено",
-  error: "Ошибка",
-};
+import { stateNames as transportNames } from "./copy";
 export function ModalPanel({
   title,
   children,
@@ -74,7 +65,7 @@ export function ModalPanel({
     >
       <header className="panel-header">
         <h2>{title}</h2>
-        <button autoFocus aria-label="Закрыть панель" onClick={onClose}>
+        <button autoFocus aria-label="Close panel" onClick={onClose}>
           <Icon name="close" />
         </button>
       </header>
@@ -97,10 +88,10 @@ export function ModalPanel({
           {message && onDismiss ? (
             <button
               className="text-action"
-              aria-label="Скрыть уведомление"
+              aria-label="Dismiss notice"
               onClick={onDismiss}
             >
-              Скрыть
+              Dismiss
             </button>
           ) : null}
         </p>
@@ -119,26 +110,26 @@ export function QueuePanel({
   const [dragged, setDragged] = useState<string | null>(null);
   return (
     <ModalPanel
-      title={`Очередь · ${c.queue.rows.length}`}
+      title={`Queue · ${c.queue.rows.length}`}
       onClose={onClose}
       message={c.message}
       onDismiss={c.messageDismissible ? () => c.dismissNotice() : undefined}
-      transport={`${c.queue.active?.title ?? "Дорожка не выбрана"} · ${transportNames[c.audio.state]}`}
+      transport={`${c.queue.active?.title ?? "No track selected"} · ${transportNames[c.audio.state]}`}
     >
       <p className="panel-help">
-        Файлы остаются на устройстве. До 100 дорожек, до 250 МиБ на файл.
+        Files stay on this device. Up to 100 tracks, 250 MiB per file.
       </p>
       <div className="panel-toolbar">
         <button onClick={() => c.clear()} disabled={!c.queue.rows.length}>
-          Очистить очередь
+          Clear queue
         </button>
         {c.importer.pending ? (
-          <button onClick={() => c.importer.cancel()}>Отменить импорт</button>
+          <button onClick={() => c.importer.cancel()}>Cancel import</button>
         ) : null}
       </div>
       {c.undo ? (
         <button className="undo" onClick={() => c.restoreUndo()}>
-          Отменить очистку · 5 с
+          Undo clear · 5 s
         </button>
       ) : null}
       <ol className="track-list">
@@ -159,7 +150,7 @@ export function QueuePanel({
             <button
               className="drag-handle"
               draggable
-              aria-label={`Перетащить ${track.title}`}
+              aria-label={`Drag ${track.title}`}
               onDragStart={(event) => {
                 setDragged(track.id);
                 event.dataTransfer.setData("text/plain", track.id);
@@ -183,23 +174,23 @@ export function QueuePanel({
               </button>
               <span className="track-meta">
                 {track.status === "pending"
-                  ? "Подготовка…"
+                  ? "Preparing…"
                   : track.status === "failed"
                     ? track.error
-                    : `${timeLabel(track.duration)}${track.id === c.queue.activeId ? " · " + (c.audio.intent ? "Воспроизведение" : "Выбрана") : ""}`}
+                    : `${timeLabel(track.duration)}${track.id === c.queue.activeId ? " · " + (c.audio.intent ? "Playing" : "Selected") : ""}`}
               </span>
               {track.status === "failed" ? (
                 <button
                   className="text-action"
                   onClick={() => c.importer.retry(track)}
                 >
-                  Повторить
+                  Retry
                 </button>
               ) : null}
             </div>
             <div className="track-actions">
               <button
-                aria-label={`Поднять ${track.title}`}
+                aria-label={`Move up ${track.title}`}
                 disabled={index === 0}
                 onClick={() => {
                   c.queue.move(track.id, index - 1);
@@ -209,7 +200,7 @@ export function QueuePanel({
                 <Icon name="up" />
               </button>
               <button
-                aria-label={`Опустить ${track.title}`}
+                aria-label={`Move down ${track.title}`}
                 disabled={index === c.queue.rows.length - 1}
                 onClick={() => {
                   c.queue.move(track.id, index + 1);
@@ -219,7 +210,7 @@ export function QueuePanel({
                 <Icon name="down" />
               </button>
               <button
-                aria-label={`Удалить ${track.title}`}
+                aria-label={`Remove ${track.title}`}
                 onClick={() => void c.remove(track.id)}
               >
                 <Icon name="trash" />
@@ -229,20 +220,18 @@ export function QueuePanel({
         ))}
       </ol>
       {!c.queue.rows.length ? (
-        <p className="panel-empty">
-          Очередь пуста. Добавьте локальные аудиофайлы.
-        </p>
+        <p className="panel-empty">Queue is empty. Add local audio files.</p>
       ) : null}
       {c.importer.duplicates.map((file, index) => (
         <div className="duplicate" key={`${file.name}-${index}`}>
-          <p>Возможный дубликат: {file.name}</p>
+          <p>Possible duplicate: {file.name}</p>
           <button
             onClick={() => {
               c.importer.duplicates.splice(index, 1);
               c.add([file], true);
             }}
           >
-            Добавить ещё раз
+            Add again
           </button>
           <button
             onClick={() => {
@@ -251,7 +240,7 @@ export function QueuePanel({
               else c.emit();
             }}
           >
-            Пропустить
+            Skip
           </button>
         </div>
       ))}
@@ -259,11 +248,11 @@ export function QueuePanel({
   );
 }
 const groupNames: Record<string, string> = {
-  appearance: "Оформление",
-  layout: "Композиция",
-  analysis: "Анализ",
-  performance: "Производительность",
-  presets: "Пресеты",
+  appearance: "Appearance",
+  layout: "Composition",
+  analysis: "Analysis",
+  performance: "Performance",
+  presets: "Presets",
   spectrogram: "Spectrogram",
   waveform: "Waveform",
   stereometer: "Stereometer",
@@ -371,6 +360,7 @@ export function SettingsPanel({
   const file = useRef<HTMLInputElement>(null);
   const section = useRef<HTMLDivElement>(null);
   useEffect(() => {
+    if (group === "appearance") return;
     section.current
       ?.querySelector(`[data-group="${group}"]`)
       ?.scrollIntoView({ block: "start" });
@@ -390,14 +380,14 @@ export function SettingsPanel({
   const effective = scheduler.effective;
   return (
     <ModalPanel
-      title="Настройки"
+      title="Settings"
       onClose={onClose}
       message={c.message}
       onDismiss={c.messageDismissible ? () => c.dismissNotice() : undefined}
-      transport={`${c.queue.active?.title ?? "Дорожка не выбрана"} · ${transportNames[c.audio.state]}`}
+      transport={`${c.queue.active?.title ?? "No track selected"} · ${transportNames[c.audio.state]}`}
     >
       <div ref={section}>
-        <nav className="settings-nav" aria-label="Группы настроек">
+        <nav className="settings-nav" aria-label="Settings groups">
           {Object.entries(groupNames).map(([key, label]) => (
             <button
               key={key}
@@ -436,11 +426,11 @@ export function SettingsPanel({
                 <Field
                   control={{
                     key: "requested",
-                    label: "Расположение",
+                    label: "Layout",
                     kind: "select",
                     options: [
-                      ["composition", "Композиция"],
-                      ["strip", "Полоса · от 1440 px"],
+                      ["composition", "Composition"],
+                      ["strip", "Strip · from 1440 px"],
                     ],
                   }}
                   value={c.settings.layout.requested}
@@ -466,7 +456,7 @@ export function SettingsPanel({
                         {names[id]}
                       </label>
                       <button
-                        aria-label={`Поднять ${names[id]}`}
+                        aria-label={`Move up ${names[id]}`}
                         disabled={index === 0}
                         onClick={() => {
                           const next = structuredClone(c.settings);
@@ -483,7 +473,7 @@ export function SettingsPanel({
                         <Icon name="up" />
                       </button>
                       <button
-                        aria-label={`Опустить ${names[id]}`}
+                        aria-label={`Move down ${names[id]}`}
                         disabled={index === 4}
                         onClick={() => {
                           const next = structuredClone(c.settings);
@@ -511,7 +501,7 @@ export function SettingsPanel({
                     onRestore();
                   }}
                 >
-                  Восстановить композицию
+                  Restore composition
                 </button>
               </>
             ) : null}
@@ -540,78 +530,73 @@ export function SettingsPanel({
             ))}
             {section === "analysis" ? (
               <p className="panel-help">
-                Громкость и отключение звука меняют только выход. Визуальный
-                уровень не меняет музыку. M=(L+R)/2; S=(L−R)/2. Частота:{" "}
-                {diagnostic.sampleRate} Гц.
+                Volume and mute affect only the output. Visual level does not
+                change the music. M=(L+R)/2; S=(L−R)/2. Sample rate:{" "}
+                {diagnostic.sampleRate} Hz.
               </p>
             ) : null}
             {section === "performance" ? (
               <div className="diagnostics">
                 <p>
-                  Целевая частота: {effective.fps} FPS
+                  Target frame rate: {effective.fps} FPS
                   <br />
-                  Эффективный DPR: {effective.dpr}
+                  Effective DPR: {effective.dpr}
                   <br />
                   {effective.reasons.join(" · ")}
                   <br />
-                  Измеренная частота:{" "}
+                  Measured frame rate:{" "}
                   {diagnostic.fps
                     ? `${diagnostic.fps.toFixed(1)} FPS`
-                    : "нет данных"}
+                    : "no data"}
                   <br />
-                  Перерисовка без новых данных p95:{" "}
-                  {diagnostic.idleRenderP95.toFixed(1)} мс
+                  Idle redraw p95: {diagnostic.idleRenderP95.toFixed(1)} ms
                 </p>
                 <p>
-                  Авто: 60 FPS на компьютере, 30 FPS на мобильном. Экономный
-                  режим: 30 FPS / DPR ≤1.5.
+                  Auto: 60 FPS on desktop, 30 FPS on mobile. Economy mode: 30
+                  FPS / DPR ≤1.5.
                 </p>
                 <p>
                   {diagnostic.primary
                     ? "AudioWorklet + Worker"
-                    : "Анализ ещё не запущен / резервный режим"}
+                    : "Analysis not started / fallback mode"}
                   <br />
-                  Память: {(diagnostic.reservedBytes / 1024 ** 2).toFixed(1)} /
-                  64 МиБ
+                  Memory: {(diagnostic.reservedBytes / 1024 ** 2).toFixed(1)} /
+                  64 MiB
                   <br />
-                  Спектральных полос: {diagnostic.buckets}
+                  Spectral buckets: {diagnostic.buckets}
                   <br />
-                  Задержка p95: {diagnostic.latencyP95.toFixed(1)} мс
+                  Latency p95: {diagnostic.latencyP95.toFixed(1)} ms
                   <br />
-                  Центр FFT p95: {diagnostic.centerAgeP95.toFixed(1)} мс
+                  FFT center age p95: {diagnostic.centerAgeP95.toFixed(1)} ms
                   <br />
-                  Выход устройства: {(diagnostic.baseLatency * 1000).toFixed(
-                    1,
-                  )}{" "}
-                  мс
+                  Device output: {(diagnostic.baseLatency * 1000).toFixed(1)} ms
                   <br />
-                  Разрывы истории: {diagnostic.gaps}
+                  History gaps: {diagnostic.gaps}
                 </p>
               </div>
             ) : null}
             {section === "waveform" || section === "spectrogram" ? (
               <p className="panel-help">
-                История: {effectiveDuration(c.settings, section).toFixed(2)} с
-                сыгранного потока. При 2× это вдвое больше времени файла.
+                History: {effectiveDuration(c.settings, section).toFixed(2)} s
+                of played signal. At 2×, this covers twice as much file time.
               </p>
             ) : null}
             {section === "waveform" || section === "stereometer" ? (
               <p className="panel-help">
-                Частотные слои: плотный низ &lt;200 Гц, тонкая середина 200–2000
-                Гц, точки верха &gt;2000 Гц. Они дополняют исходный сигнал.
+                Frequency layers: solid lows &lt;200 Hz, thin mids 200–2000 Hz,
+                dotted highs &gt;2000 Hz. They supplement the raw signal.
               </p>
             ) : null}
             {section === "oscilloscope" ? (
               <p className="panel-help">
-                Тон определяется по периодичности PCM. Для противофазного стерео
-                выбирайте L или R. При неопределённом тоне используется
-                свободное окно.
+                Pitch is detected from PCM periodicity. For anti-phase stereo,
+                choose L or R. When pitch is uncertain, a free window is used.
               </p>
             ) : null}
             {section === "spectrum" ? (
               <p className="panel-help">
-                Уровни калиброваны по пиковой амплитуде синусоиды в центре
-                FFT-бина. Нота подписывает частоту, не тональность композиции.
+                Levels are calibrated to the peak amplitude of a sine at an FFT
+                bin center. The note labels frequency, not the track key.
               </p>
             ) : null}
             {section === "presets" ? (
@@ -624,12 +609,12 @@ export function SettingsPanel({
                   ))}
                 </div>
                 <label className="preset-name">
-                  Имя пресета
+                  Preset name
                   <input
                     value={name}
                     maxLength={80}
                     onChange={(event) => setName(event.target.value)}
-                    placeholder="Мой пресет"
+                    placeholder="My preset"
                   />
                 </label>
                 <button
@@ -640,7 +625,7 @@ export function SettingsPanel({
                     setName("");
                   }}
                 >
-                  Сохранить пресет
+                  Save preset
                 </button>
                 {c.presets.map((p) => (
                   <div className="user-preset" key={p.id}>
@@ -654,12 +639,12 @@ export function SettingsPanel({
                         }}
                       >
                         <input
-                          aria-label="Новое имя пресета"
+                          aria-label="New preset name"
                           autoFocus
                           value={name}
                           onChange={(event) => setName(event.target.value)}
                         />
-                        <button>Сохранить имя</button>
+                        <button>Save name</button>
                       </form>
                     ) : (
                       <>
@@ -667,16 +652,16 @@ export function SettingsPanel({
                           {p.name}
                         </button>
                         <button
-                          aria-label={`Переименовать ${p.name}`}
+                          aria-label={`Rename ${p.name}`}
                           onClick={() => {
                             setRename(p.id);
                             setName(p.name);
                           }}
                         >
-                          Имя
+                          Rename
                         </button>
                         <button
-                          aria-label={`Удалить пресет ${p.name}`}
+                          aria-label={`Delete preset ${p.name}`}
                           onClick={() => c.deletePreset(p.id)}
                         >
                           <Icon name="trash" />
@@ -687,10 +672,10 @@ export function SettingsPanel({
                 ))}
                 <div className="panel-toolbar">
                   <button onClick={() => file.current?.click()}>
-                    Импорт JSON
+                    Import JSON
                   </button>
                   <button onClick={() => exportPreset(c.settings)}>
-                    Экспорт JSON
+                    Export JSON
                   </button>
                 </div>
                 <input
@@ -704,22 +689,22 @@ export function SettingsPanel({
                     if (!preset) return;
                     try {
                       if (preset.size > 65536)
-                        throw new Error("Файл настроек превышает 64 КиБ.");
+                        throw new Error("Settings file exceeds 64 KiB.");
                       const parsed = parsePreset(await preset.text());
                       c.setSettings(parsed);
                     } catch (error) {
                       c.notify(
                         error instanceof Error
                           ? error.message
-                          : "Неверный JSON.",
+                          : "Invalid JSON.",
                       );
                     }
                     input.value = "";
                   }}
                 />
                 <p className="panel-help">
-                  Пресеты меняют только оформление и анализ. Очередь и
-                  воспроизведение сохраняются.
+                  Presets change only appearance and analysis. Queue and
+                  playback are preserved.
                 </p>
               </>
             ) : null}
@@ -732,9 +717,9 @@ export function SettingsPanel({
             onRestore();
           }}
         >
-          Сбросить все настройки
+          Reset all settings
         </button>
-        <p className="panel-help">Очередь, позиция и громкость сохранятся.</p>
+        <p className="panel-help">Queue, position, and volume are preserved.</p>
       </div>
     </ModalPanel>
   );

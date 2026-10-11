@@ -86,9 +86,7 @@ export class AppController {
       this.storage.save(settings, this.presets);
       this.emit();
     } catch (error) {
-      this.notify(
-        error instanceof Error ? error.message : "Неверные настройки.",
-      );
+      this.notify(error instanceof Error ? error.message : "Invalid settings.");
     }
   }
   resetSettings() {
@@ -103,7 +101,7 @@ export class AppController {
       settings: structuredClone(this.settings),
     });
     const saved = this.storage.save(this.settings, this.presets);
-    if (saved) this.notify(`Пресет «${name}» сохранён.`);
+    if (saved) this.notify(`Preset “${name}” saved.`);
     this.emit();
   }
   renamePreset(id: string, name: string) {
@@ -167,7 +165,7 @@ export class AppController {
       this.audio.pause();
       this.queue.activeId = null;
       this.notify(
-        "В очереди нет доступных дорожек. Повторите подготовку или добавьте другие файлы.",
+        "No playable tracks in the queue. Retry preparation or add other files.",
       );
     }
     this.emit();

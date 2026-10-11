@@ -1,0 +1,780 @@
+{
+  "phase": "after",
+  "browser": "155.0.8059.39",
+  "channel": "chrome",
+  "errors": [],
+  "layouts": [
+    {
+      "state": "empty",
+      "width": 320,
+      "height": 568,
+      "overflow": 0,
+      "small": [],
+      "canvases": [
+        {
+          "width": 288,
+          "height": 159,
+          "cssWidth": 288,
+          "cssHeight": 159
+        },
+        {
+          "width": 288,
+          "height": 159,
+          "cssWidth": 288,
+          "cssHeight": 159
+        },
+        {
+          "width": 288,
+          "height": 227,
+          "cssWidth": 288,
+          "cssHeight": 227
+        },
+        {
+          "width": 288,
+          "height": 159,
+          "cssWidth": 288,
+          "cssHeight": 159
+        },
+        {
+          "width": 288,
+          "height": 159,
+          "cssWidth": 288,
+          "cssHeight": 159
+        }
+      ]
+    },
+    {
+      "state": "empty",
+      "width": 375,
+      "height": 812,
+      "overflow": 0,
+      "small": [],
+      "canvases": [
+        {
+          "width": 343,
+          "height": 159,
+          "cssWidth": 343,
+          "cssHeight": 159
+        },
+        {
+          "width": 343,
+          "height": 159,
+          "cssWidth": 343,
+          "cssHeight": 159
+        },
+        {
+          "width": 343,
+          "height": 282,
+          "cssWidth": 343,
+          "cssHeight": 282
+        },
+        {
+          "width": 343,
+          "height": 159,
+          "cssWidth": 343,
+          "cssHeight": 159
+        },
+        {
+          "width": 343,
+          "height": 159,
+          "cssWidth": 343,
+          "cssHeight": 159
+        }
+      ]
+    },
+    {
+      "state": "empty",
+      "width": 390,
+      "height": 844,
+      "overflow": 0,
+      "small": [],
+      "canvases": [
+        {
+          "width": 358,
+          "height": 159,
+          "cssWidth": 358,
+          "cssHeight": 159
+        },
+        {
+          "width": 358,
+          "height": 159,
+          "cssWidth": 358,
+          "cssHeight": 159
+        },
+        {
+          "width": 358,
+          "height": 297,
+          "cssWidth": 358,
+          "cssHeight": 297
+        },
+        {
+          "width": 358,
+          "height": 159,
+          "cssWidth": 358,
+          "cssHeight": 159
+        },
+        {
+          "width": 358,
+          "height": 159,
+          "cssWidth": 358,
+          "cssHeight": 159
+        }
+      ]
+    },
+    {
+      "state": "empty",
+      "width": 844,
+      "height": 390,
+      "overflow": 0,
+      "small": [],
+      "canvases": [
+        {
+          "width": 382,
+          "height": 191,
+          "cssWidth": 382,
+          "cssHeight": 191
+        },
+        {
+          "width": 382,
+          "height": 191,
+          "cssWidth": 382,
+          "cssHeight": 191
+        },
+        {
+          "width": 382,
+          "height": 191,
+          "cssWidth": 382,
+          "cssHeight": 191
+        },
+        {
+          "width": 382,
+          "height": 191,
+          "cssWidth": 382,
+          "cssHeight": 191
+        },
+        {
+          "width": 780,
+          "height": 191,
+          "cssWidth": 780,
+          "cssHeight": 191
+        }
+      ]
+    },
+    {
+      "state": "empty",
+      "width": 768,
+      "height": 1024,
+      "overflow": 0,
+      "small": [],
+      "canvases": [
+        {
+          "width": 344,
+          "height": 191,
+          "cssWidth": 344,
+          "cssHeight": 191
+        },
+        {
+          "width": 344,
+          "height": 191,
+          "cssWidth": 344,
+          "cssHeight": 191
+        },
+        {
+          "width": 344,
+          "height": 191,
+          "cssWidth": 344,
+          "cssHeight": 191
+        },
+        {
+          "width": 344,
+          "height": 191,
+          "cssWidth": 344,
+          "cssHeight": 191
+        },
+        {
+          "width": 704,
+          "height": 191,
+          "cssWidth": 704,
+          "cssHeight": 191
+        }
+      ]
+    },
+    {
+      "state": "empty",
+      "width": 1024,
+      "height": 768,
+      "overflow": 0,
+      "small": [],
+      "canvases": [
+        {
+          "width": 472,
+          "height": 191,
+          "cssWidth": 472,
+          "cssHeight": 191
+        },
+        {
+          "width": 472,
+          "height": 191,
+          "cssWidth": 472,
+          "cssHeight": 191
+        },
+        {
+          "width": 472,
+          "height": 191,
+          "cssWidth": 472,
+          "cssHeight": 191
+        },
+        {
+          "width": 472,
+          "height": 191,
+          "cssWidth": 472,
+          "cssHeight": 191
+        },
+        {
+          "width": 960,
+          "height": 191,
+          "cssWidth": 960,
+          "cssHeight": 191
+        }
+      ]
+    },
+    {
+      "state": "empty",
+      "width": 1440,
+      "height": 900,
+      "overflow": 0,
+      "small": [],
+      "canvases": [
+        {
+          "width": 749,
+          "height": 191,
+          "cssWidth": 749,
+          "cssHeight": 191
+        },
+        {
+          "width": 611,
+          "height": 191,
+          "cssWidth": 611,
+          "cssHeight": 191
+        },
+        {
+          "width": 265,
+          "height": 191,
+          "cssWidth": 265,
+          "cssHeight": 191
+        },
+        {
+          "width": 471,
+          "height": 191,
+          "cssWidth": 471,
+          "cssHeight": 191
+        },
+        {
+          "width": 609,
+          "height": 191,
+          "cssWidth": 609,
+          "cssHeight": 191
+        }
+      ]
+    },
+    {
+      "state": "empty",
+      "width": 1920,
+      "height": 1080,
+      "overflow": 0,
+      "small": [],
+      "canvases": [
+        {
+          "width": 1013,
+          "height": 239,
+          "cssWidth": 1013,
+          "cssHeight": 239
+        },
+        {
+          "width": 827,
+          "height": 239,
+          "cssWidth": 827,
+          "cssHeight": 239
+        },
+        {
+          "width": 361,
+          "height": 239,
+          "cssWidth": 361,
+          "cssHeight": 239
+        },
+        {
+          "width": 639,
+          "height": 239,
+          "cssWidth": 639,
+          "cssHeight": 239
+        },
+        {
+          "width": 825,
+          "height": 239,
+          "cssWidth": 825,
+          "cssHeight": 239
+        }
+      ]
+    },
+    {
+      "state": "playing",
+      "width": 320,
+      "height": 568,
+      "overflow": 0,
+      "small": [],
+      "canvases": [
+        {
+          "width": 288,
+          "height": 159,
+          "cssWidth": 288,
+          "cssHeight": 159
+        },
+        {
+          "width": 288,
+          "height": 159,
+          "cssWidth": 288,
+          "cssHeight": 159
+        },
+        {
+          "width": 288,
+          "height": 227,
+          "cssWidth": 288,
+          "cssHeight": 227
+        },
+        {
+          "width": 288,
+          "height": 159,
+          "cssWidth": 288,
+          "cssHeight": 159
+        },
+        {
+          "width": 288,
+          "height": 159,
+          "cssWidth": 288,
+          "cssHeight": 159
+        }
+      ]
+    },
+    {
+      "state": "playing",
+      "width": 375,
+      "height": 812,
+      "overflow": 0,
+      "small": [],
+      "canvases": [
+        {
+          "width": 343,
+          "height": 159,
+          "cssWidth": 343,
+          "cssHeight": 159
+        },
+        {
+          "width": 343,
+          "height": 159,
+          "cssWidth": 343,
+          "cssHeight": 159
+        },
+        {
+          "width": 343,
+          "height": 282,
+          "cssWidth": 343,
+          "cssHeight": 282
+        },
+        {
+          "width": 343,
+          "height": 159,
+          "cssWidth": 343,
+          "cssHeight": 159
+        },
+        {
+          "width": 343,
+          "height": 159,
+          "cssWidth": 343,
+          "cssHeight": 159
+        }
+      ]
+    },
+    {
+      "state": "playing",
+      "width": 390,
+      "height": 844,
+      "overflow": 0,
+      "small": [],
+      "canvases": [
+        {
+          "width": 358,
+          "height": 159,
+          "cssWidth": 358,
+          "cssHeight": 159
+        },
+        {
+          "width": 358,
+          "height": 159,
+          "cssWidth": 358,
+          "cssHeight": 159
+        },
+        {
+          "width": 358,
+          "height": 297,
+          "cssWidth": 358,
+          "cssHeight": 297
+        },
+        {
+          "width": 358,
+          "height": 159,
+          "cssWidth": 358,
+          "cssHeight": 159
+        },
+        {
+          "width": 358,
+          "height": 159,
+          "cssWidth": 358,
+          "cssHeight": 159
+        }
+      ]
+    },
+    {
+      "state": "playing",
+      "width": 844,
+      "height": 390,
+      "overflow": 0,
+      "small": [],
+      "canvases": [
+        {
+          "width": 382,
+          "height": 191,
+          "cssWidth": 382,
+          "cssHeight": 191
+        },
+        {
+          "width": 382,
+          "height": 191,
+          "cssWidth": 382,
+          "cssHeight": 191
+        },
+        {
+          "width": 382,
+          "height": 191,
+          "cssWidth": 382,
+          "cssHeight": 191
+        },
+        {
+          "width": 382,
+          "height": 191,
+          "cssWidth": 382,
+          "cssHeight": 191
+        },
+        {
+          "width": 780,
+          "height": 191,
+          "cssWidth": 780,
+          "cssHeight": 191
+        }
+      ]
+    },
+    {
+      "state": "playing",
+      "width": 768,
+      "height": 1024,
+      "overflow": 0,
+      "small": [],
+      "canvases": [
+        {
+          "width": 344,
+          "height": 191,
+          "cssWidth": 344,
+          "cssHeight": 191
+        },
+        {
+          "width": 344,
+          "height": 191,
+          "cssWidth": 344,
+          "cssHeight": 191
+        },
+        {
+          "width": 344,
+          "height": 191,
+          "cssWidth": 344,
+          "cssHeight": 191
+        },
+        {
+          "width": 344,
+          "height": 191,
+          "cssWidth": 344,
+          "cssHeight": 191
+        },
+        {
+          "width": 704,
+          "height": 191,
+          "cssWidth": 704,
+          "cssHeight": 191
+        }
+      ]
+    },
+    {
+      "state": "playing",
+      "width": 1024,
+      "height": 768,
+      "overflow": 0,
+      "small": [],
+      "canvases": [
+        {
+          "width": 472,
+          "height": 191,
+          "cssWidth": 472,
+          "cssHeight": 191
+        },
+        {
+          "width": 472,
+          "height": 191,
+          "cssWidth": 472,
+          "cssHeight": 191
+        },
+        {
+          "width": 472,
+          "height": 191,
+          "cssWidth": 472,
+          "cssHeight": 191
+        },
+        {
+          "width": 472,
+          "height": 191,
+          "cssWidth": 472,
+          "cssHeight": 191
+        },
+        {
+          "width": 960,
+          "height": 191,
+          "cssWidth": 960,
+          "cssHeight": 191
+        }
+      ]
+    },
+    {
+      "state": "playing",
+      "width": 1440,
+      "height": 900,
+      "overflow": 0,
+      "small": [],
+      "canvases": [
+        {
+          "width": 749,
+          "height": 191,
+          "cssWidth": 749,
+          "cssHeight": 191
+        },
+        {
+          "width": 611,
+          "height": 191,
+          "cssWidth": 611,
+          "cssHeight": 191
+        },
+        {
+          "width": 265,
+          "height": 191,
+          "cssWidth": 265,
+          "cssHeight": 191
+        },
+        {
+          "width": 471,
+          "height": 191,
+          "cssWidth": 471,
+          "cssHeight": 191
+        },
+        {
+          "width": 609,
+          "height": 191,
+          "cssWidth": 609,
+          "cssHeight": 191
+        }
+      ]
+    },
+    {
+      "state": "playing",
+      "width": 1920,
+      "height": 1080,
+      "overflow": 0,
+      "small": [],
+      "canvases": [
+        {
+          "width": 1013,
+          "height": 239,
+          "cssWidth": 1013,
+          "cssHeight": 239
+        },
+        {
+          "width": 827,
+          "height": 239,
+          "cssWidth": 827,
+          "cssHeight": 239
+        },
+        {
+          "width": 361,
+          "height": 239,
+          "cssWidth": 361,
+          "cssHeight": 239
+        },
+        {
+          "width": 639,
+          "height": 239,
+          "cssWidth": 639,
+          "cssHeight": 239
+        },
+        {
+          "width": 825,
+          "height": 239,
+          "cssWidth": 825,
+          "cssHeight": 239
+        }
+      ]
+    },
+    {
+      "state": "paused",
+      "width": 1440,
+      "height": 900,
+      "overflow": 0,
+      "small": [],
+      "canvases": [
+        {
+          "width": 749,
+          "height": 191,
+          "cssWidth": 749,
+          "cssHeight": 191
+        },
+        {
+          "width": 611,
+          "height": 191,
+          "cssWidth": 611,
+          "cssHeight": 191
+        },
+        {
+          "width": 265,
+          "height": 191,
+          "cssWidth": 265,
+          "cssHeight": 191
+        },
+        {
+          "width": 471,
+          "height": 191,
+          "cssWidth": 471,
+          "cssHeight": 191
+        },
+        {
+          "width": 609,
+          "height": 191,
+          "cssWidth": 609,
+          "cssHeight": 191
+        }
+      ]
+    },
+    {
+      "state": "dark-paused",
+      "width": 1440,
+      "height": 900,
+      "overflow": 0,
+      "small": [],
+      "canvases": [
+        {
+          "width": 749,
+          "height": 191,
+          "cssWidth": 749,
+          "cssHeight": 191
+        },
+        {
+          "width": 611,
+          "height": 191,
+          "cssWidth": 611,
+          "cssHeight": 191
+        },
+        {
+          "width": 265,
+          "height": 191,
+          "cssWidth": 265,
+          "cssHeight": 191
+        },
+        {
+          "width": 471,
+          "height": 191,
+          "cssWidth": 471,
+          "cssHeight": 191
+        },
+        {
+          "width": 609,
+          "height": 191,
+          "cssWidth": 609,
+          "cssHeight": 191
+        }
+      ]
+    },
+    {
+      "state": "dark-paused",
+      "width": 320,
+      "height": 568,
+      "overflow": 0,
+      "small": [],
+      "canvases": [
+        {
+          "width": 288,
+          "height": 159,
+          "cssWidth": 288,
+          "cssHeight": 159
+        },
+        {
+          "width": 288,
+          "height": 159,
+          "cssWidth": 288,
+          "cssHeight": 159
+        },
+        {
+          "width": 288,
+          "height": 227,
+          "cssWidth": 288,
+          "cssHeight": 227
+        },
+        {
+          "width": 288,
+          "height": 159,
+          "cssWidth": 288,
+          "cssHeight": 159
+        },
+        {
+          "width": 288,
+          "height": 159,
+          "cssWidth": 288,
+          "cssHeight": 159
+        }
+      ]
+    }
+  ],
+  "performance": {
+    "sampleRate": 48000,
+    "buckets": 1024,
+    "reservedBytes": 25352432,
+    "historyBytes": 2336384,
+    "gaps": 2,
+    "latencyMedian": 16.020833333335815,
+    "latencyP95": 26.687500000001307,
+    "latencyMax": 37.3541666666668,
+    "centerAgeP95": 69.34375000000159,
+    "fps": 59.523809523812105,
+    "renderP95": 4.9000000059604645,
+    "idleRenderP95": 9.200000002980232,
+    "samples": 2813,
+    "contextState": "running",
+    "baseLatency": 0.01,
+    "outputLatency": 0.04,
+    "primary": true,
+    "sessionId": 4,
+    "epoch": 2,
+    "capturing": true,
+    "effective": {
+      "fps": 60,
+      "dpr": 1,
+      "reasons": [
+        "Device DPR: 1; settings limit: 2"
+      ]
+    },
+    "time": 60.050667,
+    "state": "playing"
+  }
+}

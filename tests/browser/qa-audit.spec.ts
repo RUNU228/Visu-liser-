@@ -7,11 +7,9 @@ async function play(page: Page) {
     .first()
     .setInputFiles(["tests/fixtures/long.wav", "tests/fixtures/silence.wav"]);
   await expect(
-    page.getByRole("button", { name: "Воспроизвести", exact: true }),
+    page.getByRole("button", { name: "Play", exact: true }),
   ).toBeEnabled();
-  await page
-    .getByRole("button", { name: "Воспроизвести", exact: true })
-    .click();
+  await page.getByRole("button", { name: "Play", exact: true }).click();
   await expect
     .poll(() =>
       page.evaluate(
@@ -19,7 +17,7 @@ async function play(page: Page) {
       ),
     )
     .toBe(true);
-  await page.getByRole("button", { name: "Пауза", exact: true }).click();
+  await page.getByRole("button", { name: "Pause", exact: true }).click();
 }
 async function inspect(page: Page, id: string, u = 0.5, v = 0.5) {
   const canvas = page.locator(`.module-${id} canvas`);
@@ -52,10 +50,10 @@ test("M-01 fade keyboard crosses Off and 2 seconds both ways", async ({
 }) => {
   await page.goto("/");
   await page
-    .getByRole("button", { name: "Настройки Spectrogram", exact: true })
+    .getByRole("button", { name: "Settings Spectrogram", exact: true })
     .click();
   const fade = page.getByRole("slider", {
-    name: "Затухание истории",
+    name: "History fade",
     exact: true,
   });
   await fade.focus();
@@ -120,9 +118,7 @@ test("M-02/M-07 pinned measurements invalidate at reset boundaries; pause preser
   ).toBeGreaterThan(0);
   const pin = await inspect(page, "spectrum");
   await expect(pin).toBeVisible();
-  await page
-    .getByRole("button", { name: "Следующая дорожка", exact: true })
-    .click();
+  await page.getByRole("button", { name: "Next track", exact: true }).click();
   await expect(pin).toBeHidden();
   await page.evaluate(() =>
     (window as any).visualizer.controller.audio.seek(0.2),
@@ -144,7 +140,7 @@ test("M-02/M-07 pinned measurements invalidate at reset boundaries; pause preser
   await page.evaluate(() => (window as any).visualizer.controller.clear());
   await expect(pin).toBeHidden();
   await expect(page.locator(".module-waveform .sr-only")).toContainText(
-    "Текущий RMS: 0.0000.",
+    "Current RMS: 0.0000.",
   );
   await page.evaluate(() =>
     (window as any).visualizer.controller.restoreUndo(),
@@ -172,7 +168,7 @@ test("M-03 Strip focus expands every module and restores layout", async ({
       "Spectrum",
     ]) {
       await page
-        .getByRole("button", { name: `Развернуть ${id}`, exact: true })
+        .getByRole("button", { name: `Expand ${id}`, exact: true })
         .click();
       await expect
         .poll(
@@ -182,7 +178,7 @@ test("M-03 Strip focus expands every module and restores layout", async ({
         )
         .toBe(560);
       await page
-        .getByRole("button", { name: `Свернуть ${id}`, exact: true })
+        .getByRole("button", { name: `Collapse ${id}`, exact: true })
         .click();
       await expect(page.locator(".workspace")).toHaveClass(/strip/);
     }
@@ -216,9 +212,7 @@ test("M-04 long scope fill changes rendered pixels at desktop and mobile widths"
     s.oscilloscope.fill = false;
     c.setSettings(s);
   });
-  await page
-    .getByRole("button", { name: "Воспроизвести", exact: true })
-    .click();
+  await page.getByRole("button", { name: "Play", exact: true }).click();
   await expect
     .poll(() =>
       page.evaluate(
@@ -228,7 +222,7 @@ test("M-04 long scope fill changes rendered pixels at desktop and mobile widths"
       ),
     )
     .toBeGreaterThan(4000);
-  await page.getByRole("button", { name: "Пауза", exact: true }).click();
+  await page.getByRole("button", { name: "Pause", exact: true }).click();
   for (const width of [1440, 390]) {
     await page.setViewportSize({ width, height: 1000 });
     const canvas = page.locator(".module-oscilloscope canvas");
@@ -284,9 +278,7 @@ test("M-05/M-06 actual plots measure rendered lanes and applied gain", async ({
     s.analysis.trimDb = 6;
     c.setSettings(s);
   });
-  await page
-    .getByRole("button", { name: "Воспроизвести", exact: true })
-    .click();
+  await page.getByRole("button", { name: "Play", exact: true }).click();
   await expect
     .poll(() =>
       page.evaluate(
@@ -294,15 +286,13 @@ test("M-05/M-06 actual plots measure rendered lanes and applied gain", async ({
       ),
     )
     .toBeGreaterThan(0.5);
-  await page.getByRole("button", { name: "Пауза", exact: true }).click();
+  await page.getByRole("button", { name: "Pause", exact: true }).click();
   await expect(await inspect(page, "waveform", 0.98, 0.45)).toHaveText(/^M ·/);
   await page.locator(".module-waveform canvas").press("Escape");
   await expect(await inspect(page, "waveform", 0.98, 0.99)).not.toHaveText(
     /^(S|M) ·/,
   );
-  await expect(await inspect(page, "stereometer")).toContainText(
-    "усиление 3.99×",
-  );
+  await expect(await inspect(page, "stereometer")).toContainText("gain 3.99×");
 });
 
 test("M-08 paused theme redraws leave live latency and FPS samples unchanged", async ({
@@ -352,9 +342,7 @@ test("M-08 paused theme redraws leave live latency and FPS samples unchanged", a
       ),
     )
     .toBe(0);
-  await page
-    .getByRole("button", { name: "Воспроизвести", exact: true })
-    .click();
+  await page.getByRole("button", { name: "Play", exact: true }).click();
   await expect
     .poll(() =>
       page.evaluate(
@@ -362,7 +350,7 @@ test("M-08 paused theme redraws leave live latency and FPS samples unchanged", a
       ),
     )
     .toBeGreaterThan(0);
-  await page.getByRole("button", { name: "Пауза", exact: true }).click();
+  await page.getByRole("button", { name: "Pause", exact: true }).click();
   await page.setViewportSize({ width: 390, height: 1000 });
   await expect
     .poll(() =>
@@ -377,8 +365,8 @@ test("L-01/L-02 preset notices localize, resolve and dismiss while invalid impor
   page,
 }) => {
   await page.goto("/");
-  await page.getByRole("button", { name: "Настройки", exact: true }).click();
-  await page.getByRole("button", { name: "Пресеты", exact: true }).click();
+  await page.getByRole("button", { name: "Settings", exact: true }).click();
+  await page.getByRole("button", { name: "Presets", exact: true }).click();
   const file = page.getByRole("dialog").locator("input[type=file]");
   const before = await page.evaluate(() =>
     JSON.stringify((window as any).visualizer.controller.settings),
@@ -388,7 +376,7 @@ test("L-01/L-02 preset notices localize, resolve and dismiss while invalid impor
     mimeType: "application/json",
     buffer: Buffer.from("{"),
   });
-  await expect(page.getByRole("dialog")).toContainText("Неверный JSON");
+  await expect(page.getByRole("dialog")).toContainText("Invalid JSON");
   expect(
     await page.evaluate(() =>
       JSON.stringify((window as any).visualizer.controller.settings),
@@ -399,7 +387,7 @@ test("L-01/L-02 preset notices localize, resolve and dismiss while invalid impor
     mimeType: "application/json",
     buffer: Buffer.from(before),
   });
-  await expect(page.getByRole("dialog")).not.toContainText("Неверный JSON");
+  await expect(page.getByRole("dialog")).not.toContainText("Invalid JSON");
   await file.setInputFiles({
     name: "invalid.json",
     mimeType: "application/json",
@@ -407,10 +395,10 @@ test("L-01/L-02 preset notices localize, resolve and dismiss while invalid impor
   });
   await page
     .getByRole("dialog")
-    .getByRole("button", { name: "Скрыть уведомление", exact: true })
+    .getByRole("button", { name: "Dismiss notice", exact: true })
     .click();
-  await expect(page.getByRole("dialog")).not.toContainText("Неверный JSON");
-  await page.getByRole("button", { name: "Закрыть панель" }).click();
+  await expect(page.getByRole("dialog")).not.toContainText("Invalid JSON");
+  await page.getByRole("button", { name: "Close panel" }).click();
   await page.evaluate(() => {
     const c = (window as any).visualizer.controller;
     c.notify("Старое сообщение");
@@ -426,26 +414,20 @@ test("L-03 diagnostics expose effective Economy caps while retaining preferences
 }) => {
   await page.goto("/");
   await page.setViewportSize({ width: 360, height: 1000 });
-  await page.getByRole("button", { name: "Настройки", exact: true }).click();
-  await page
-    .getByRole("button", { name: "Производительность", exact: true })
-    .click();
-  await page
-    .getByLabel("Частота отрисовки", { exact: true })
-    .selectOption("60");
-  await page.getByLabel("Предел DPR", { exact: true }).selectOption("2");
-  await page.getByLabel("Экономный режим", { exact: true }).check();
+  await page.getByRole("button", { name: "Settings", exact: true }).click();
+  await page.getByRole("button", { name: "Performance", exact: true }).click();
+  await page.getByLabel("Frame rate", { exact: true }).selectOption("60");
+  await page.getByLabel("DPR limit", { exact: true }).selectOption("2");
+  await page.getByLabel("Economy mode", { exact: true }).check();
   await expect(page.locator(".diagnostics")).toContainText(
-    "Целевая частота: 30 FPS",
+    "Target frame rate: 30 FPS",
   );
-  await expect(page.locator(".diagnostics")).toContainText(
-    "Эффективный DPR: 1",
+  await expect(page.locator(".diagnostics")).toContainText("Effective DPR: 1");
+  await expect(page.locator(".diagnostics")).toContainText("economy mode");
+  await expect(page.getByLabel("Frame rate", { exact: true })).toHaveValue(
+    "60",
   );
-  await expect(page.locator(".diagnostics")).toContainText("экономный режим");
-  await expect(
-    page.getByLabel("Частота отрисовки", { exact: true }),
-  ).toHaveValue("60");
-  await expect(page.getByLabel("Предел DPR", { exact: true })).toHaveValue("2");
+  await expect(page.getByLabel("DPR limit", { exact: true })).toHaveValue("2");
 });
 
 test("L-01 skipping a duplicate resolves its notice; storage failure survives dismissal", async ({
@@ -456,12 +438,12 @@ test("L-01 skipping a duplicate resolves its notice; storage failure survives di
     const c = (window as any).visualizer.controller;
     c.add([c.queue.active.file]);
   });
-  await page.getByRole("button", { name: /Очередь, 2/ }).click();
-  await page.getByRole("button", { name: "Пропустить", exact: true }).click();
+  await page.getByRole("button", { name: /Queue, 2/ }).click();
+  await page.getByRole("button", { name: "Skip", exact: true }).click();
   await expect(page.getByRole("dialog")).not.toContainText(
-    "Возможный дубликат",
+    "Possible duplicate",
   );
-  await page.getByRole("button", { name: "Закрыть панель" }).click();
+  await page.getByRole("button", { name: "Close panel" }).click();
   await page.evaluate(() => {
     const c = (window as any).visualizer.controller;
     Storage.prototype.setItem = () => {
@@ -471,13 +453,13 @@ test("L-01 skipping a duplicate resolves its notice; storage failure survives di
     c.notify("Временное сообщение");
   });
   await page
-    .getByRole("button", { name: "Скрыть уведомление", exact: true })
+    .getByRole("button", { name: "Dismiss notice", exact: true })
     .click();
   await expect(page.locator(".status-line")).toContainText(
-    "Настройки не удалось сохранить",
+    "Settings could not be saved",
   );
   await page.evaluate(() => (window as any).visualizer.controller.clear());
   await expect(page.locator(".status-line")).toContainText(
-    "Настройки не удалось сохранить",
+    "Settings could not be saved",
   );
 });

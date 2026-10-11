@@ -11,8 +11,8 @@ function local() {
   return map;
 }
 describe("durable settings", () => {
-  it("reports malformed imported JSON in Russian", () => {
-    expect(() => parsePreset("{")).toThrow(/Неверный JSON/);
+  it("reports malformed imported JSON in English", () => {
+    expect(() => parsePreset("{")).toThrow(/Invalid JSON/);
   });
   it("restores every successfully saved user preset", () => {
     local();

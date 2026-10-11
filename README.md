@@ -1,6 +1,6 @@
 # Visu@lizer
 
-Local audio player and five simultaneous, measured audio visualizers. Built from [Visualizer_TZ_EN.md](Visualizer_TZ_EN.md), version 1.2. Russian interface. Light/dark monochrome composition, restrained decoration, and accessible controls.
+Local audio player and five simultaneous, measured audio visualizers. Built from [Visualizer_TZ_EN.md](Visualizer_TZ_EN.md), version 1.2. English interface. Light/dark monochrome composition, restrained decoration, and accessible controls. The [2026-10-11 visual pass](docs/VISUAL_PASS_2026-10-11.md) documents the refined wordmark, typography, responsive fixes, and verification gaps.
 
 ## Run
 
@@ -29,7 +29,7 @@ Deploy the `dist/` directory to any static HTTPS host. HTTPS or localhost is req
 - Five independent Canvas displays: spectral history, raw amplitude extrema/RMS, paired stereo cloud/correlation, YIN-triggered captured oscilloscope, calibrated current FFT spectrum.
 - Every module's specified control; order, visibility, focus, fullscreen, responsive Composition/Strip, linked main-history duration, global visual trim.
 - Four complete built-in presets, user save/rename/delete, validated JSON import/export, versioned guarded localStorage. Reload keeps settings but starts with an empty queue.
-- Separate plot freeze, reduced motion, keyboard controls, modal focus management, Cyrillic fonts served locally.
+- Separate plot freeze, reduced motion, keyboard controls, modal focus management, and local fonts with multilingual UI-text coverage.
 
 Keyboard outside controls: Space play/pause; Left/Right ±5 seconds; Shift+Left/Right ±15 seconds; M mute; Q queue; Escape closes panel, popover, or focus mode. Range inputs keep native keyboard behavior. Touch a plot to pin its measurement.
 
@@ -90,4 +90,4 @@ Fixtures are original deterministic synthetic tones, silence, antiphase and mult
 
 ## Fonts and licenses
 
-Inter Variable 5.2.8 (neutral grotesque, Cyrillic) and IBM Plex Mono 5.2.7 (values, tabular numerals, Cyrillic) are bundled through Fontsource under the SIL Open Font License 1.1. Font licenses are retained in `licenses/`. Original SVG Visu@lizer lettering uses the locally served font; no reference artwork or artist logos are included. Runtime dependencies are pinned with `package-lock.json`.
+Inter Variable 5.2.8 supplies UI text and multilingual external titles; IBM Plex Mono 5.2.7 supplies Latin numerical/technical readouts at weight 400. Both are bundled locally through Fontsource under the SIL Open Font License 1.1, with licenses retained in `licenses/`. The original [SVG wordmark](src/assets/wordmark.svg) uses editable geometric paths and needs no font. No reference artwork or artist logos are included. Runtime dependencies are pinned with `package-lock.json`.

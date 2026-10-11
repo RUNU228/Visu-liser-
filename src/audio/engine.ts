@@ -168,7 +168,7 @@ export class AudioEngine {
       void this.closeGate();
       this.state = "error";
       this.notice(
-        "Не удалось декодировать дорожку. Файл исключён из автоматического воспроизведения.",
+        "Track could not be decoded. File was excluded from automatic playback.",
       );
       this.failed();
       this.changed();
@@ -206,7 +206,7 @@ export class AudioEngine {
         (performance.now() - this.lastPCM < 250 || outstanding) &&
         performance.now() - this.lastWorkerResult > deadline
       )
-        void this.recoverWorker("Анализ не отвечает.");
+        void this.recoverWorker("Analysis is not responding.");
     }, 200);
   }
   private ensureGraph() {
@@ -233,7 +233,7 @@ export class AudioEngine {
         void this.closeGate();
         if (this.intent) {
           this.state = "interrupted";
-          this.notice("Аудио прервано. Нажмите «Продолжить».");
+          this.notice("Audio interrupted. Press Play to resume.");
         }
       } else {
         this.lastWorkerResult = performance.now();
@@ -261,11 +261,11 @@ export class AudioEngine {
         await this.installTap();
       } catch {
         this.fallback(
-          "AudioWorklet недоступен. Используется ограниченный анализ AnalyserNode.",
+          "AudioWorklet is unavailable. Using limited AnalyserNode analysis.",
         );
       }
     })().catch(() =>
-      this.fallback("Worker недоступен. Используется ограниченный анализ."),
+      this.fallback("Worker is unavailable. Using limited analysis."),
     );
     return this.initialization;
   }
@@ -295,8 +295,8 @@ export class AudioEngine {
           cancel();
         } else void this.recoverWorker(reason);
       };
-      worker.onerror = () => failed("Ошибка Worker.");
-      worker.onmessageerror = () => failed("Ошибка передачи данных анализа.");
+      worker.onerror = () => failed("Worker error.");
+      worker.onmessageerror = () => failed("Analysis data transfer error.");
       worker.onmessage = (event: MessageEvent<WorkerOutput>) => {
         const message = event.data;
         if (this.worker !== worker) return;
@@ -358,7 +358,7 @@ export class AudioEngine {
       const processorError = () => {
         if (!ready) cancel();
         else if (node === this.tap)
-          void this.recoverWorklet("Ошибка аудиопроцессора.");
+          void this.recoverWorklet("Audio processor error.");
       };
       this.pendingTapCancel = cancel;
       node.addEventListener("processorerror", processorError);
@@ -391,9 +391,7 @@ export class AudioEngine {
           this.store.clear();
           resolve();
         } else if (data.type === "protocolerror")
-          void this.recoverWorklet(
-            "Переполнена очередь границ аудиопроцессора.",
-          );
+          void this.recoverWorklet("Audio processor boundary queue is full.");
         else if (data.type === "boundary") {
           const waiter = this.boundaryWaiters.get(data.id);
           if (waiter) {
@@ -471,7 +469,9 @@ export class AudioEngine {
           return;
         }
         reject(new Error("Boundary acknowledgement timeout"));
-        void this.recoverWorklet("Аудиопроцессор не подтвердил границу.");
+        void this.recoverWorklet(
+          "Audio processor did not acknowledge a boundary.",
+        );
       }, 250);
       this.boundaryWaiters.set(id, { resolve, reject, timer });
       tap.port.postMessage(message);
@@ -737,9 +737,7 @@ export class AudioEngine {
       ) {
         this.intent = false;
         this.state = "paused";
-        this.notice(
-          "Воспроизведение заблокировано. Нажмите «Воспроизвести» ещё раз.",
-        );
+        this.notice("Playback is blocked. Press Play again.");
       }
     }
     this.changed();
@@ -848,7 +846,7 @@ export class AudioEngine {
     this.store.fallback = true;
     this.store.error = reason;
     this.store.clear();
-    this.notice(reason + " Стереометр и определение тона недоступны.");
+    this.notice(reason + " Stereometer and pitch detection are unavailable.");
     this.startFallback();
     this.changed();
   }
@@ -912,7 +910,7 @@ export class AudioEngine {
       await this.updateGate();
     } catch {
       this.recovering = false;
-      this.fallback("Не удалось восстановить анализ.");
+      this.fallback("Could not restore analysis.");
     }
     this.changed();
   }

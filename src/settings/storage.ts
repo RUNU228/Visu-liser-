@@ -13,7 +13,7 @@ export class SettingsStorage {
     if (!this.failed) {
       this.failed = true;
       this.notice(
-        "Настройки не удалось сохранить на этом устройстве. Доступен экспорт JSON.",
+        "Settings could not be saved on this device. Export JSON to keep a copy.",
       );
     }
   }
@@ -43,7 +43,7 @@ export class SettingsStorage {
       if (error instanceof DOMException) this.failure();
       else
         this.notice(
-          "Сохранённые настройки повреждены. Восстановлены исходные значения.",
+          "Saved settings are damaged. Default settings were restored.",
         );
       return { settings: defaults(), presets: [] };
     }
@@ -63,13 +63,13 @@ export class SettingsStorage {
 }
 export function parsePreset(text: string) {
   if (new Blob([text]).size > 65536)
-    throw new Error("Файл настроек превышает 64 КиБ.");
+    throw new Error("Settings file exceeds 64 KiB.");
   let parsed: unknown;
   try {
     parsed = JSON.parse(text);
   } catch (error) {
     if (error instanceof SyntaxError)
-      throw new Error("Неверный JSON. Проверьте синтаксис файла настроек.");
+      throw new Error("Invalid JSON. Check the settings file syntax.");
     throw error;
   }
   return validateSettings(parsed);

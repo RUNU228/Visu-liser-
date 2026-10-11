@@ -54,7 +54,7 @@ export class RenderScheduler {
   }
   measure(id: ModuleId, u: number, v: number) {
     const entry = this.plots.get(id);
-    if (!entry) return "Нет данных";
+    if (!entry) return "No data";
     return entry.renderer.measure(
       u,
       v,
@@ -79,11 +79,9 @@ export class RenderScheduler {
         mobile || s.performance.economy ? 1.5 : 2,
       ),
       reasons: [
-        ...(s.performance.economy
-          ? ["экономный режим: 30 FPS / DPR ≤1.5"]
-          : []),
-        ...(mobile ? ["мобильное устройство: Авто 30 FPS / DPR ≤1.5"] : []),
-        `DPR устройства: ${devicePixelRatio || 1}; предел настройки: ${s.performance.dpr}`,
+        ...(s.performance.economy ? ["economy mode: 30 FPS / DPR ≤1.5"] : []),
+        ...(mobile ? ["mobile device: Auto 30 FPS / DPR ≤1.5"] : []),
+        `Device DPR: ${devicePixelRatio || 1}; settings limit: ${s.performance.dpr}`,
       ],
     };
   }

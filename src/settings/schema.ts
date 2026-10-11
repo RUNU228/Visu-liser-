@@ -110,166 +110,166 @@ const e = (
   options: [string | number, string][],
 ): Control => ({ key, label, kind: "select", options });
 const channels: [string, string][] = [
-  ["L", "Левый · L"],
-  ["R", "Правый · R"],
+  ["L", "Left · L"],
+  ["R", "Right · R"],
   ["M", "Mid · (L+R)/2"],
   ["S", "Side · (L−R)/2"],
 ];
 const spectral: Control[] = [
   e(
     "fftSize",
-    "Размер FFT",
+    "FFT size",
     [1024, 2048, 4096, 8192, 16384].map((v) => [v, String(v)]),
   ),
-  e("window", "Окно", [
+  e("window", "Window", [
     ["hann", "Hann"],
     ["blackman", "Blackman"],
   ]),
-  e("scale", "Шкала частот", [
-    ["log", "Логарифмическая"],
-    ["linear", "Линейная"],
+  e("scale", "Frequency scale", [
+    ["log", "Logarithmic"],
+    ["linear", "Linear"],
     ["mel", "Mel"],
   ]),
-  n("floor", "Нижний уровень", -120, -40, 1, "dBFS"),
-  n("ceiling", "Верхний уровень", -30, 0, 1, "dBFS"),
-  e("channel", "Канал", [["stereo", "Энергия L/R"], ...channels]),
+  n("floor", "Floor", -120, -40, 1, "dBFS"),
+  n("ceiling", "Ceiling", -30, 0, 1, "dBFS"),
+  e("channel", "Channel", [["stereo", "L/R energy"], ...channels]),
 ];
 export const controls: Record<string, Control[]> = {
   appearance: [
-    e("theme", "Тема", [
-      ["light", "Светлая"],
-      ["dark", "Тёмная"],
+    e("theme", "Theme", [
+      ["light", "Light"],
+      ["dark", "Dark"],
     ]),
-    e("decoration", "Декор", [
-      ["off", "Выключен"],
-      ["subtle", "Сдержанный"],
-      ["normal", "Обычный"],
+    e("decoration", "Decoration", [
+      ["off", "Off"],
+      ["subtle", "Subtle"],
+      ["normal", "Normal"],
     ]),
-    b("glitch", "Глитч"),
-    b("lighting", "Мягкий свет"),
+    b("glitch", "Glitch"),
+    b("lighting", "Soft lighting"),
   ],
   analysis: [
-    n("trimDb", "Визуальный уровень", -12, 12, 0.5, "dB"),
-    b("linked", "Связать время двух историй"),
-    n("sharedDuration", "Общая история", 0.5, 40, 0.5, "с"),
+    n("trimDb", "Visual level", -12, 12, 0.5, "dB"),
+    b("linked", "Link both history durations"),
+    n("sharedDuration", "Shared history", 0.5, 40, 0.5, "s"),
   ],
   performance: [
-    e("fps", "Частота отрисовки", [
-      ["auto", "Авто"],
+    e("fps", "Frame rate", [
+      ["auto", "Auto"],
       ["60", "60 FPS"],
       ["30", "30 FPS"],
     ]),
-    e("dpr", "Предел DPR", [
+    e("dpr", "DPR limit", [
       [1, "1"],
       [1.5, "1.5"],
       [2, "2"],
     ]),
-    b("economy", "Экономный режим"),
+    b("economy", "Economy mode"),
   ],
   spectrogram: [
-    e("orientation", "Ориентация", [
-      ["horizontal", "Горизонтальная"],
-      ["vertical", "Вертикальная"],
+    e("orientation", "Orientation", [
+      ["horizontal", "Horizontal"],
+      ["vertical", "Vertical"],
     ]),
-    n("duration", "Базовая история", 2, 20, 0.5, "с"),
-    n("speed", "Скорость прокрутки", 0.25, 4, 0.25, "×"),
-    e("timeMode", "Движение времени", [
-      ["scroll", "Прокрутка"],
-      ["sweep", "Развёртка"],
+    n("duration", "Base history", 2, 20, 0.5, "s"),
+    n("speed", "Scroll speed", 0.25, 4, 0.25, "×"),
+    e("timeMode", "Time movement", [
+      ["scroll", "Scroll"],
+      ["sweep", "Sweep"],
     ]),
     ...spectral,
-    n("gamma", "Контраст γ", 0.5, 2, 0.1),
-    b("grid", "Сетка"),
-    b("labels", "Подписи краёв"),
+    n("gamma", "Contrast γ", 0.5, 2, 0.1),
+    b("grid", "Grid"),
+    b("labels", "Edge labels"),
     {
-      ...n("fade", "Затухание истории", 0, 20, 1, "с · 0 выкл.; ≥2 до 1/e"),
+      ...n("fade", "History fade", 0, 20, 1, "s · 0 off; ≥2 to 1/e"),
       values: [0, ...Array.from({ length: 19 }, (_, i) => i + 2)],
     },
   ],
   waveform: [
-    e("lane1", "Дорожка 1", channels),
-    e("lane2", "Дорожка 2", [["off", "Выключена"], ...channels]),
-    n("duration", "Базовая история", 1, 10, 0.5, "с"),
-    n("speed", "Скорость прокрутки", 0.25, 4, 0.25, "×"),
-    e("style", "Стиль", [
-      ["outline", "Контур"],
-      ["filled", "Заливка"],
-      ["bands", "Частотные слои"],
+    e("lane1", "Lane 1", channels),
+    e("lane2", "Lane 2", [["off", "Off"], ...channels]),
+    n("duration", "Base history", 1, 10, 0.5, "s"),
+    n("speed", "Scroll speed", 0.25, 4, 0.25, "×"),
+    e("style", "Style", [
+      ["outline", "Outline"],
+      ["filled", "Fill"],
+      ["bands", "Frequency layers"],
     ]),
-    n("gain", "Визуальное усиление", 0.5, 4, 0.25, "×"),
-    b("rms", "Огибающая RMS"),
-    e("bandHistory", "История полос", [
-      ["off", "Выключена"],
-      ["fast", "Быстрая · 2 с"],
-      ["slow", "Медленная · 8 с"],
+    n("gain", "Visual gain", 0.5, 4, 0.25, "×"),
+    b("rms", "RMS envelope"),
+    e("bandHistory", "Band history", [
+      ["off", "Off"],
+      ["fast", "Fast · 2 s"],
+      ["slow", "Slow · 8 s"],
     ]),
   ],
   stereometer: [
-    e("geometry", "Геометрия", [
+    e("geometry", "Geometry", [
       ["ms", "M/S"],
-      ["lr", "L/R · Лиссажу"],
-      ["auto", "M/S · автоувеличение"],
+      ["lr", "L/R · Lissajous"],
+      ["auto", "M/S · auto zoom"],
     ]),
-    n("windowMs", "Окно точек", 20, 200, 5, "мс"),
-    n("persistenceMs", "Послесвечение", 0, 500, 10, "мс · до 1/e"),
-    n("pointSize", "Размер точки", 1, 3, 0.5, "px"),
-    n("gain", "Визуальное усиление", 0.5, 4, 0.25, "×"),
-    b("grid", "Сетка"),
-    b("labels", "Направления"),
-    b("correlation", "Корреляция"),
-    b("bands", "Частотные слои"),
+    n("windowMs", "Point window", 20, 200, 5, "ms"),
+    n("persistenceMs", "Persistence", 0, 500, 10, "ms · to 1/e"),
+    n("pointSize", "Point size", 1, 3, 0.5, "px"),
+    n("gain", "Visual gain", 0.5, 4, 0.25, "×"),
+    b("grid", "Grid"),
+    b("labels", "Directions"),
+    b("correlation", "Correlation"),
+    b("bands", "Frequency layers"),
   ],
   oscilloscope: [
-    e("mode", "Режим", [
-      ["pitch", "По тону"],
-      ["free", "Свободный"],
+    e("mode", "Mode", [
+      ["pitch", "Pitch"],
+      ["free", "Free"],
     ]),
-    e("cycles", "Число периодов", [
-      [1, "Один"],
-      [2, "Два"],
-      [4, "Четыре"],
+    e("cycles", "Cycles", [
+      [1, "One"],
+      [2, "Two"],
+      [4, "Four"],
     ]),
-    n("windowMs", "Свободное окно", 5, 100, 1, "мс"),
-    e("channel", "Канал", channels),
-    e("trigger", "Триггер", [
-      ["off", "Выключен"],
-      ["rising", "Восходящий"],
-      ["falling", "Нисходящий"],
+    n("windowMs", "Free window", 5, 100, 1, "ms"),
+    e("channel", "Channel", channels),
+    e("trigger", "Trigger", [
+      ["off", "Off"],
+      ["rising", "Rising"],
+      ["falling", "Falling"],
     ]),
-    n("level", "Уровень триггера", -0.5, 0.5, 0.01),
-    n("gain", "Визуальное усиление", 0.5, 4, 0.25, "×"),
-    n("persistenceMs", "Послесвечение", 0, 200, 10, "мс · до 1/e"),
-    b("fill", "Заливка"),
+    n("level", "Trigger level", -0.5, 0.5, 0.01),
+    n("gain", "Visual gain", 0.5, 4, 0.25, "×"),
+    n("persistenceMs", "Persistence", 0, 200, 10, "ms · to 1/e"),
+    b("fill", "Fill"),
   ],
   spectrum: [
-    e("style", "Стиль", [
-      ["line", "Линия"],
-      ["bars", "Столбцы"],
-      ["both", "Оба"],
+    e("style", "Style", [
+      ["line", "Line"],
+      ["bars", "Bars"],
+      ["both", "Both"],
     ]),
-    n("smoothing", "Сглаживание", 0, 99, 1, "%"),
-    n("tilt", "Наклон", -6, 6, 0.5, "dB/октаву"),
+    n("smoothing", "Smoothing", 0, 99, 1, "%"),
+    n("tilt", "Tilt", -6, 6, 0.5, "dB/octave"),
     ...spectral,
-    b("peaks", "Удержание пиков"),
-    b("note", "Частота и нота"),
+    b("peaks", "Peak hold"),
+    b("note", "Frequency and note"),
   ],
 };
 export function validateSettings(input: unknown): Settings {
   if (!input || typeof input !== "object" || Array.isArray(input))
-    throw new Error("Ожидался объект настроек.");
+    throw new Error("Expected a settings object.");
   const raw = input as Record<string, unknown>;
   if (
     raw.schemaVersion !== undefined &&
     raw.schemaVersion !== 0 &&
     raw.schemaVersion !== 1
   )
-    throw new Error("Эта версия настроек не поддерживается.");
+    throw new Error("This settings version is unsupported.");
   const output = defaults();
   for (const [group, descriptors] of Object.entries(controls)) {
     const supplied = raw[group];
     if (supplied === undefined) continue;
     if (!supplied || typeof supplied !== "object" || Array.isArray(supplied))
-      throw new Error(`Неверная группа: ${group}.`);
+      throw new Error(`Invalid group: ${group}.`);
     for (const c of descriptors) {
       const v = (supplied as Record<string, unknown>)[c.key];
       if (v === undefined) continue;
@@ -290,7 +290,7 @@ export function validateSettings(input: unknown): Settings {
           v !== 0 &&
           v < 2)
       )
-        throw new Error(`Недопустимое значение: ${c.label}.`);
+        throw new Error(`Invalid value: ${c.label}.`);
       (output[group as keyof Settings] as unknown as Record<string, unknown>)[
         c.key
       ] = v;
@@ -299,11 +299,11 @@ export function validateSettings(input: unknown): Settings {
   if (raw.layout !== undefined) {
     const l = raw.layout;
     if (!l || typeof l !== "object" || Array.isArray(l))
-      throw new Error("Неверная компоновка.");
+      throw new Error("Invalid layout.");
     const layout = l as Record<string, unknown>;
     if (layout.requested !== undefined) {
       if (!["composition", "strip"].includes(layout.requested as string))
-        throw new Error("Неверная компоновка.");
+        throw new Error("Invalid layout.");
       output.layout.requested = layout.requested as "composition" | "strip";
     }
     if (layout.order !== undefined) {
@@ -313,7 +313,7 @@ export function validateSettings(input: unknown): Settings {
         new Set(layout.order).size !== 5 ||
         layout.order.some((id) => !MODULES.includes(id))
       )
-        throw new Error("Порядок должен содержать пять разных модулей.");
+        throw new Error("Order must contain five distinct modules.");
       output.layout.order = [...layout.order] as ModuleId[];
     }
     if (layout.enabled !== undefined) {
@@ -322,11 +322,11 @@ export function validateSettings(input: unknown): Settings {
         typeof layout.enabled !== "object" ||
         Array.isArray(layout.enabled)
       )
-        throw new Error("Неверная видимость.");
+        throw new Error("Invalid visibility.");
       for (const id of MODULES) {
         const v = (layout.enabled as Record<string, unknown>)[id];
         if (v === undefined) continue;
-        if (typeof v !== "boolean") throw new Error("Неверная видимость.");
+        if (typeof v !== "boolean") throw new Error("Invalid visibility.");
         output.layout.enabled[id] = v;
       }
     }
@@ -404,7 +404,7 @@ export function reserveAnalysis(s: Settings, sampleRate: number) {
   const total =
     spectrogram + waveform + pcm + fft + results + renderers + 8 * 1024 ** 2;
   if (spectrogram > 24 * 1024 ** 2 || total > 64 * 1024 ** 2)
-    throw new Error("Настройки превышают лимит памяти анализа 64 МиБ.");
+    throw new Error("Settings exceed the 64 MiB analysis memory limit.");
   return {
     total,
     spectrogram,

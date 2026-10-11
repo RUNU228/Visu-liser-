@@ -4,7 +4,7 @@ test("every settings control has a unique label target and mobile icon controls 
   page,
 }) => {
   await page.goto("/");
-  await page.getByRole("button", { name: "Настройки", exact: true }).click();
+  await page.getByRole("button", { name: "Settings", exact: true }).click();
   const duplicateIds = await page
     .locator("dialog [id]")
     .evaluateAll((elements) => {
@@ -12,13 +12,15 @@ test("every settings control has a unique label target and mobile icon controls 
       return ids.filter((id, index) => ids.indexOf(id) !== index);
     });
   expect(duplicateIds).toEqual([]);
-  await page.getByRole("button", { name: "Закрыть панель" }).click();
+  await page.getByRole("button", { name: "Close panel" }).click();
   await page.setViewportSize({ width: 360, height: 800 });
   await expect(
-    page.getByRole("button", { name: "Добавить аудио", exact: true }),
+    page
+      .locator(".top-actions")
+      .getByRole("button", { name: "Add audio", exact: true }),
   ).toBeVisible();
   await expect(
-    page.getByRole("button", { name: "Заморозить", exact: true }),
+    page.getByRole("button", { name: "Freeze", exact: true }),
   ).toBeVisible();
 });
 
@@ -35,31 +37,29 @@ test("packaged primary path plays mandatory codecs through real visible controls
       .first()
       .setInputFiles(`tests/fixtures/${file}`);
     await expect(
-      page.getByRole("button", { name: "Воспроизвести", exact: true }),
+      page.getByRole("button", { name: "Play", exact: true }),
     ).toBeEnabled();
-    await page
-      .getByRole("button", { name: "Воспроизвести", exact: true })
-      .click();
+    await page.getByRole("button", { name: "Play", exact: true }).click();
     await expect(page.locator(".module-waveform .sr-only")).toContainText(
       /RMS: 0\.[1-9]/,
     );
     await expect(page.locator(".module-stereometer .sr-only")).toContainText(
-      /Корреляция: 0\./,
+      /Correlation: 0\./,
     );
     await expect(page.locator(".module-oscilloscope .sr-only")).toContainText(
-      /Основная частота: \d+/,
+      /Fundamental frequency: \d+/,
     );
-    await page.getByRole("button", { name: "Настройки", exact: true }).click();
+    await page.getByRole("button", { name: "Settings", exact: true }).click();
     await page
-      .getByRole("button", { name: "Производительность", exact: true })
+      .getByRole("button", { name: "Performance", exact: true })
       .click();
     await expect(page.locator(".diagnostics")).toContainText(
       "AudioWorklet + Worker",
     );
-    await page.getByRole("button", { name: "Закрыть панель" }).click();
-    await page.getByRole("button", { name: "Пауза", exact: true }).click();
+    await page.getByRole("button", { name: "Close panel" }).click();
+    await page.getByRole("button", { name: "Pause", exact: true }).click();
     await expect(
-      page.getByRole("button", { name: "Воспроизвести", exact: true }),
+      page.getByRole("button", { name: "Play", exact: true }),
     ).toBeVisible();
   }
   expect(errors).toEqual([]);
@@ -73,21 +73,23 @@ test("production canvases, theme, focus and mobile transport work without diagno
     .locator("input[type=file]")
     .first()
     .setInputFiles("tests/fixtures/long.wav");
-  await page
-    .getByRole("button", { name: "Воспроизвести", exact: true })
-    .click();
+  await page.getByRole("button", { name: "Play", exact: true }).click();
   await page.waitForTimeout(8500);
   await page.screenshot({
-    path: `docs/screenshots/${test.info().project.name}-production-light-1440.png`,
+    path: test
+      .info()
+      .outputPath(`${test.info().project.name}-production-light-1440.png`),
     fullPage: true,
   });
-  await page.getByRole("button", { name: "Тёмная тема" }).click();
+  await page.getByRole("button", { name: "Switch to dark theme" }).click();
   await page.screenshot({
-    path: `docs/screenshots/${test.info().project.name}-production-dark-1440.png`,
+    path: test
+      .info()
+      .outputPath(`${test.info().project.name}-production-dark-1440.png`),
     fullPage: true,
   });
   await page
-    .getByRole("button", { name: "Развернуть Spectrum", exact: true })
+    .getByRole("button", { name: "Expand Spectrum", exact: true })
     .click();
   await expect(page.locator(".module-spectrum")).toHaveClass(/focused/);
   await page.keyboard.press("Escape");
@@ -102,10 +104,12 @@ test("production canvases, theme, focus and mobile transport work without diagno
   }
   await page.locator(".workspace-toolbar .text-action").first().click();
   await page.screenshot({
-    path: `docs/screenshots/${test.info().project.name}-production-dark-360.png`,
+    path: test
+      .info()
+      .outputPath(`${test.info().project.name}-production-dark-360.png`),
     fullPage: true,
   });
-  await page.getByRole("button", { name: "Светлая тема" }).click();
+  await page.getByRole("button", { name: "Switch to light theme" }).click();
   // Theme redraw is intentionally frozen too; unfreeze briefly updates all visible canvases.
   await page.locator(".workspace-toolbar .text-action").first().click();
   for (const canvas of await page.locator("canvas").all()) {
@@ -114,7 +118,9 @@ test("production canvases, theme, focus and mobile transport work without diagno
   }
   await page.locator(".workspace-toolbar .text-action").first().click();
   await page.screenshot({
-    path: `docs/screenshots/${test.info().project.name}-production-light-360.png`,
+    path: test
+      .info()
+      .outputPath(`${test.info().project.name}-production-light-360.png`),
     fullPage: true,
   });
   expect(
