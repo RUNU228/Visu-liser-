@@ -1,7 +1,6 @@
 import { createRoot } from "react-dom/client";
 import "@fontsource-variable/inter";
-import "@fontsource/ibm-plex-mono/400.css";
-import "@fontsource/ibm-plex-mono/cyrillic-400.css";
+import "./app/fonts.css";
 import "./app/styles.css";
 import { AppController } from "./app/controller";
 import { RenderScheduler } from "./visualizers/scheduler";

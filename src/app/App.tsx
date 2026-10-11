@@ -13,16 +13,7 @@ import { Icon, Logo } from "./icons";
 import { AUDIO_ACCEPT } from "../player/importer";
 import { type ModuleId } from "../shared/types";
 import { timeLabel } from "../shared/units";
-const stateNames = {
-  empty: "Нет дорожки",
-  ready: "Готово к воспроизведению",
-  playing: "Воспроизведение",
-  paused: "Пауза",
-  buffering: "Буферизация",
-  interrupted: "Аудио прервано",
-  ended: "Завершено",
-  error: "Ошибка файла",
-};
+import { stateNames, repeatNames } from "./copy";
 const stripWeights: Record<ModuleId, number> = {
   spectrogram: 28,
   waveform: 22,
@@ -53,6 +44,14 @@ export function App({
   const strip = s.layout.requested === "strip" && width >= 1440 && !focus;
   const elapsed = seekPreview ?? c.audio.media.currentTime;
   const duration = active?.duration ?? 0;
+  const playAction =
+    c.audio.intent && c.audio.state !== "interrupted" ? "Pause" : "Play";
+  const muteAction = c.audio.muted ? "Unmute" : "Mute";
+  const themeAction =
+    s.appearance.theme === "light"
+      ? "Switch to dark theme"
+      : "Switch to light theme";
+  const repeatLabel = `Repeat: ${repeatNames[c.queue.repeat]}`;
   useEffect(() => {
     const resize = () => setWidth(innerWidth);
     window.addEventListener("resize", resize);
@@ -190,17 +189,15 @@ export function App({
           <div className="top-actions">
             <button
               className="add-button"
-              aria-label="Добавить аудио"
+              aria-label="Add audio"
               onClick={() => input.current?.click()}
             >
               <Icon name="plus" />
-              <span>Добавить аудио</span>
+              <span>Add audio</span>
             </button>
             <button
-              aria-label={
-                s.appearance.theme === "light" ? "Тёмная тема" : "Светлая тема"
-              }
-              title="Сменить тему"
+              aria-label={themeAction}
+              title={themeAction}
               onClick={() => {
                 const next = structuredClone(s);
                 next.appearance.theme =
@@ -211,8 +208,8 @@ export function App({
               <Icon name={s.appearance.theme === "light" ? "moon" : "sun"} />
             </button>
             <button
-              aria-label="Настройки"
-              title="Настройки"
+              aria-label="Settings"
+              title="Settings"
               onClick={() => openSettings("appearance")}
             >
               <Icon name="settings" />
@@ -237,20 +234,22 @@ export function App({
                 className={`state-dot${c.audio.intent ? " is-playing" : ""}`}
               />
               {stateNames[c.audio.state]}
-              {c.audio.frozen ? " · графики заморожены" : ""}
+              {c.audio.frozen ? " · plots frozen" : ""}
             </span>
             <div>
               <button
                 className="text-action"
                 aria-pressed={c.audio.frozen}
-                aria-label={c.audio.frozen ? "Разморозить" : "Заморозить"}
+                aria-label={c.audio.frozen ? "Unfreeze" : "Freeze"}
                 onClick={() => c.audio.setFrozen(!c.audio.frozen)}
               >
                 <Icon name="freeze" />
-                <span>{c.audio.frozen ? "Разморозить" : "Заморозить"}</span>
+                <span>{c.audio.frozen ? "Unfreeze" : "Freeze"}</span>
               </button>
               <button
                 className="text-action fullscreen"
+                aria-label="Fullscreen"
+                title="Fullscreen"
                 onClick={async () => {
                   try {
                     if (document.fullscreenElement)
@@ -259,25 +258,35 @@ export function App({
                       await workspace.current.requestFullscreen();
                     else
                       c.notify(
-                        "Полноэкранный режим недоступен. Используйте фокус модуля.",
+                        "Fullscreen is unavailable. Expand a visualizer instead.",
                       );
                   } catch {
                     c.notify(
-                      "Полноэкранный режим недоступен. Используйте фокус модуля.",
+                      "Fullscreen is unavailable. Expand a visualizer instead.",
                     );
                   }
                 }}
               >
                 <Icon name="expand" />
-                <span>На весь экран</span>
+                <span>Fullscreen</span>
               </button>
             </div>
           </div>
           <section
             ref={workspace}
             className={`workspace${strip ? " strip" : ""}${focus ? " focus-mode" : ""}${dragging ? " drag-active" : ""}`}
-            aria-label="Визуализаторы звука"
+            aria-label="Audio visualizers"
           >
+            {!c.queue.rows.length && visible.length ? (
+              <div className="empty-import">
+                <button onClick={() => input.current?.click()}>
+                  <Icon name="plus" />
+                  <span>Add audio</span>
+                </button>
+                <p>or drag files here</p>
+                <small>MP3 · PCM WAV · other browser-supported formats</small>
+              </div>
+            ) : null}
             {(focus && s.layout.enabled[focus] ? [focus] : visible).map(
               (id, index) => (
                 <div className="module-slot" key={id} style={slot(id, index)}>
@@ -294,7 +303,7 @@ export function App({
             )}
             {!visible.length ? (
               <div className="all-hidden">
-                <p>Все визуализаторы скрыты</p>
+                <p>All visualizers are hidden</p>
                 <button
                   onClick={() => {
                     const next = structuredClone(s);
@@ -304,25 +313,13 @@ export function App({
                     setFocus(null);
                   }}
                 >
-                  Показать визуализаторы
+                  Show visualizers
                 </button>
-              </div>
-            ) : null}
-            {!c.queue.rows.length && visible.length ? (
-              <div className="empty-import">
-                <button onClick={() => input.current?.click()}>
-                  <Icon name="plus" />
-                  <span>Добавьте аудио</span>
-                </button>
-                <p>или перетащите файлы сюда</p>
-                <small>
-                  MP3 · PCM WAV · другие форматы, доступные в браузере
-                </small>
               </div>
             ) : null}
             {dragging ? (
               <div className="drop-hint" aria-live="polite">
-                Отпустите, чтобы добавить аудио
+                Drop to add audio
               </div>
             ) : null}
           </section>
@@ -331,28 +328,28 @@ export function App({
               <span>
                 {c.audio.store.error}{" "}
                 {c.audio.store.fallback
-                  ? "Стереометр недоступен. Остальные графики: моно / Free / ограниченная история AnalyserNode."
+                  ? "Stereometer is unavailable. Other plots use mono / Free / limited AnalyserNode history."
                   : ""}
               </span>
               <button onClick={() => void c.audio.retryAnalysis()}>
-                Повторить анализ
+                Retry analysis
               </button>
             </div>
           ) : null}
-          <section className="player" aria-label="Аудиоплеер">
+          <section className="player" aria-label="Audio player">
             <span
               className="sr-only"
               role="status"
               aria-live="polite"
               aria-atomic="true"
             >
-              {active?.title ?? "Дорожка не выбрана"} ·{" "}
+              {active?.title ?? "No track selected"} ·{" "}
               {stateNames[c.audio.state]}
             </span>
             <div className="transport">
               <button
-                aria-label="Предыдущая дорожка"
-                title="Предыдущая"
+                aria-label="Previous track"
+                title="Previous track"
                 disabled={!active}
                 onClick={() => c.previous()}
               >
@@ -360,16 +357,8 @@ export function App({
               </button>
               <button
                 className="play-button"
-                aria-label={
-                  c.audio.intent && c.audio.state !== "interrupted"
-                    ? "Пауза"
-                    : "Воспроизвести"
-                }
-                title={
-                  c.audio.state === "interrupted"
-                    ? "Продолжить"
-                    : "Space · воспроизведение / пауза"
-                }
+                aria-label={playAction}
+                title={`${playAction} · Space`}
                 disabled={!active}
                 onClick={() => c.togglePlay()}
               >
@@ -382,8 +371,8 @@ export function App({
                 />
               </button>
               <button
-                aria-label="Следующая дорожка"
-                title="Следующая"
+                aria-label="Next track"
+                title="Next track"
                 disabled={!active}
                 onClick={() => c.advance()}
               >
@@ -391,13 +380,13 @@ export function App({
               </button>
             </div>
             <div className="track-info">
-              <strong title={active?.title}>
-                {active?.title ?? "Ничего не выбрано"}
+              <strong title={active?.title} aria-label={active?.title}>
+                {active?.title ?? "No track selected"}
               </strong>
               <span>
                 {active
-                  ? "Локальный аудиофайл"
-                  : "Ваша музыка остаётся на устройстве"}
+                  ? "Local audio file"
+                  : "Your music stays on this device"}
               </span>
             </div>
             <div className="seek">
@@ -407,8 +396,8 @@ export function App({
               </div>
               <input
                 type="range"
-                aria-label="Позиция воспроизведения"
-                aria-valuetext={`${timeLabel(elapsed)} из ${timeLabel(duration)}`}
+                aria-label="Playback position"
+                aria-valuetext={`${timeLabel(elapsed)} of ${timeLabel(duration)}`}
                 min={0}
                 max={duration || 1}
                 step={0.1}
@@ -437,8 +426,8 @@ export function App({
             </div>
             <div className="player-options">
               <button
-                aria-label={`Повтор: ${c.queue.repeat === "off" ? "выключен" : c.queue.repeat === "queue" ? "очередь" : "одна дорожка"}`}
-                title="Повтор: выкл. → очередь → одна"
+                aria-label={repeatLabel}
+                title={repeatLabel}
                 aria-pressed={c.queue.repeat !== "off"}
                 className={c.queue.repeat !== "off" ? "selected" : ""}
                 onClick={() => {
@@ -455,8 +444,8 @@ export function App({
                 {c.queue.repeat === "one" ? <sup>1</sup> : null}
               </button>
               <button
-                aria-label="Перемешать"
-                title="Перемешать"
+                aria-label="Shuffle"
+                title="Shuffle"
                 aria-pressed={c.queue.shuffle}
                 className={c.queue.shuffle ? "selected" : ""}
                 onClick={() => {
@@ -467,7 +456,7 @@ export function App({
                 <Icon name="shuffle" />
               </button>
               <select
-                aria-label="Скорость воспроизведения"
+                aria-label="Playback speed"
                 value={c.audio.rate}
                 onChange={(event) =>
                   void c.audio.setRate(Number(event.target.value))
@@ -482,8 +471,8 @@ export function App({
             </div>
             <div className="volume">
               <button
-                aria-label={c.audio.muted ? "Включить звук" : "Отключить звук"}
-                title="M · отключить звук"
+                aria-label={muteAction}
+                title={`${muteAction} · M`}
                 onClick={() =>
                   c.audio.setVolume(c.audio.volume, !c.audio.muted)
                 }
@@ -494,7 +483,7 @@ export function App({
               </button>
               <input
                 type="range"
-                aria-label="Громкость"
+                aria-label="Volume"
                 min={0}
                 max={100}
                 step={1}
@@ -507,7 +496,7 @@ export function App({
             </div>
             <button
               className="queue-button"
-              aria-label={`Очередь, ${c.queue.rows.length} дорожек`}
+              aria-label={`Queue, ${c.queue.rows.length} track${c.queue.rows.length === 1 ? "" : "s"}`}
               onClick={() => setPanel("queue")}
             >
               <Icon name="queue" />
@@ -516,7 +505,7 @@ export function App({
             <button
               className="mobile-more"
               popoverTarget="mobile-player-options"
-              aria-label="Дополнительные параметры плеера"
+              aria-label="More player options"
             >
               <Icon name="settings" />
             </button>
@@ -528,15 +517,15 @@ export function App({
             {c.messageDismissible ? (
               <button
                 className="text-action"
-                aria-label="Скрыть уведомление"
+                aria-label="Dismiss notice"
                 onClick={() => c.dismissNotice()}
               >
-                Скрыть
+                Dismiss
               </button>
             ) : null}
             {c.undo ? (
               <button className="text-action" onClick={() => c.restoreUndo()}>
-                Отменить очистку
+                Undo clear
               </button>
             ) : null}
             {c.importer.pending ? (
@@ -544,23 +533,23 @@ export function App({
                 className="text-action"
                 onClick={() => c.importer.cancel()}
               >
-                Отменить импорт
+                Cancel import
               </button>
             ) : null}
           </div>
         </main>
         <footer className="page-footer">
           <span>Visu@lizer</span>
-          <span>Локальный звук. Видимый сигнал.</span>
-          <span>MP3 / WAV · ≤250 МиБ · 100 дорожек</span>
+          <span>Local sound. Visible signal.</span>
+          <span>MP3 / WAV · ≤250 MiB · 100 tracks</span>
         </footer>
       </div>
       <div id="mobile-player-options" popover="auto" className="player-popover">
-        <p>Параметры плеера</p>
+        <p>Player options</p>
         <label>
-          Скорость
+          Speed
           <select
-            aria-label="Скорость воспроизведения на мобильном"
+            aria-label="Mobile playback speed"
             value={c.audio.rate}
             onChange={(event) =>
               void c.audio.setRate(Number(event.target.value))
@@ -585,12 +574,7 @@ export function App({
             c.emit();
           }}
         >
-          Повтор:{" "}
-          {c.queue.repeat === "off"
-            ? "выключен"
-            : c.queue.repeat === "queue"
-              ? "очередь"
-              : "одна дорожка"}
+          {repeatLabel}
         </button>
         <button
           aria-pressed={c.queue.shuffle}
@@ -599,7 +583,7 @@ export function App({
             c.emit();
           }}
         >
-          Перемешать
+          Shuffle
         </button>
       </div>
       {panel === "queue" ? (

@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 248 50" fill="none" stroke="currentColor" stroke-width="3.6" stroke-linecap="square" stroke-linejoin="round">
+  <title>Visu@lizer</title>
+  <!-- Original geometric lettering. The open @ tail is the static glitch detail. -->
+  <path d="M4 10 15 39 26 10 M33 22v17 M33 12v1 M60 24c-3-3-16-4-16 3 0 7 17 3 17 10 0 6-13 6-18 2 M70 22v11c0 10 19 10 19-1V22m0 10v7"/>
+  <path stroke-width="3" d="M125 23v10c0 7 12 7 12-5 0-13-8-20-19-20-13 0-20 9-20 20s8 17 20 17h9 M125 24c-2-7-15-6-15 4s13 12 15 2"/>
+  <path d="M146 10v29 M157 22v17 M157 12v1 M167 22h20l-20 17h20 M197 30h20c0-12-20-12-20 1 0 11 15 11 20 6 M228 22v17m0-9c0-7 6-10 13-8"/>
+  <path stroke-width="1.4" d="M128 44h8"/>
+</svg>

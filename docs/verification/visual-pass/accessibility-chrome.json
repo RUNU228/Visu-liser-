@@ -1,0 +1,162 @@
+{
+  "channel": "chrome",
+  "zoom": [
+    {
+      "width": 720,
+      "height": 450,
+      "dpr": 2,
+      "overflow": 0,
+      "clipped": []
+    },
+    {
+      "width": 320,
+      "height": 568,
+      "dpr": 2,
+      "overflow": 0,
+      "clipped": []
+    }
+  ],
+  "contrast": [
+    {
+      "theme": "light",
+      "text": [
+        {
+          "fg": "--ink",
+          "bg": "--bg",
+          "ratio": 16.870539635879155
+        },
+        {
+          "fg": "--secondary",
+          "bg": "--bg",
+          "ratio": 5.862602037837915
+        },
+        {
+          "fg": "--ink",
+          "bg": "--surface",
+          "ratio": 18.096211979655724
+        },
+        {
+          "fg": "--secondary",
+          "bg": "--surface",
+          "ratio": 6.288529680665899
+        },
+        {
+          "fg": "--ink",
+          "bg": "--field",
+          "ratio": 15.597083882512038
+        },
+        {
+          "fg": "--secondary",
+          "bg": "--field",
+          "ratio": 5.420069406640464
+        }
+      ],
+      "boundaries": [
+        {
+          "bg": "--bg",
+          "ratio": 3.358688539972308
+        },
+        {
+          "bg": "--surface",
+          "ratio": 3.602702764985499
+        },
+        {
+          "bg": "--field",
+          "ratio": 3.1051613062672523
+        }
+      ]
+    },
+    {
+      "theme": "dark",
+      "text": [
+        {
+          "fg": "--ink",
+          "bg": "--bg",
+          "ratio": 17.2968335111471
+        },
+        {
+          "fg": "--secondary",
+          "bg": "--bg",
+          "ratio": 8.420402190172062
+        },
+        {
+          "fg": "--ink",
+          "bg": "--surface",
+          "ratio": 16.289620648284387
+        },
+        {
+          "fg": "--secondary",
+          "bg": "--surface",
+          "ratio": 7.9300732874308215
+        },
+        {
+          "fg": "--ink",
+          "bg": "--field",
+          "ratio": 14.06796599169501
+        },
+        {
+          "fg": "--secondary",
+          "bg": "--field",
+          "ratio": 6.848532800607317
+        }
+      ],
+      "boundaries": [
+        {
+          "bg": "--bg",
+          "ratio": 4.95301414655927
+        },
+        {
+          "bg": "--surface",
+          "ratio": 4.66459490756154
+        },
+        {
+          "bg": "--field",
+          "ratio": 4.028415636033898
+        }
+      ]
+    }
+  ],
+  "touch": {
+    "state": "playing",
+    "rate": 1.25,
+    "repeat": "queue",
+    "shuffle": true,
+    "coarse": false,
+    "maxTouchPoints": 1
+  },
+  "states": [
+    "metadata loading",
+    "disabled pending selection",
+    "playing",
+    "paused",
+    "frozen",
+    "file error",
+    "duplicate",
+    "undo",
+    "saved preset",
+    "preset rename",
+    "all hidden",
+    "restored",
+    "analysis fallback"
+  ],
+  "fonts": [
+    {
+      "url": "http://127.0.0.1:5173/node_modules/@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-400-normal.woff2",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:5173/node_modules/@fontsource-variable/inter/files/inter-latin-wght-normal.woff2",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:5173/node_modules/@fontsource-variable/inter/files/inter-greek-wght-normal.woff2",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:5173/node_modules/@fontsource-variable/inter/files/inter-cyrillic-wght-normal.woff2",
+      "status": 200
+    }
+  ],
+  "browser": "155.0.8059.39",
+  "errors": []
+}

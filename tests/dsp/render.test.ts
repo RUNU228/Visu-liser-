@@ -270,9 +270,7 @@ describe("rendered measurement fidelity", () => {
       store.accept(result(48000, 1));
       store.stereometer!.autoGain = 1.5;
       const text = new PlotRenderer("stereometer").measure(0.5, 0.5, s, store);
-      expect(text).toContain(
-        `усиление ${geometry === "auto" ? "5.99" : "3.99"}×`,
-      );
+      expect(text).toContain(`gain ${geometry === "auto" ? "5.99" : "3.99"}×`);
     },
   );
   it.each([
@@ -320,7 +318,7 @@ describe("rendered measurement fidelity", () => {
     store.spectrogram = [slice(3.6, -30), slice(9.6, -10)];
     expect(
       new PlotRenderer("spectrogram").measure(0.2, 0.5, s, store),
-    ).toContain("−0.40 с");
+    ).toContain("−0.40 s");
   });
   it("reports missing captured history instead of borrowing a nearby spectral measurement", () => {
     canvas();
@@ -330,7 +328,7 @@ describe("rendered measurement fidelity", () => {
     store.spectrogram = [slice(9.55, -10)];
     expect(
       new PlotRenderer("spectrogram").measure((9.59 - 2) / 8, 0.5, s, store),
-    ).toBe("История недоступна");
+    ).toBe("History unavailable");
   });
   it("measures the raw maximum of the rendered spectral pixel bucket", () => {
     const target = canvas(),

@@ -19,7 +19,7 @@ await page
   .locator("input[type=file]")
   .first()
   .setInputFiles("tests/fixtures/soak.mp3");
-await page.getByRole("button", { name: "Воспроизвести", exact: true }).click();
+await page.getByRole("button", { name: "Play", exact: true }).click();
 await page.waitForFunction(
   () => window.visualizer.controller.audio.diagnostics.capturing,
 );

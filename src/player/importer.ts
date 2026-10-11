@@ -43,13 +43,11 @@ export class LocalImporter {
         )
       ) {
         this.duplicates.push(file);
-        this.notice(
-          `Возможный дубликат: ${file.name}. Можно добавить ещё раз.`,
-        );
+        this.notice(`Possible duplicate: ${file.name}. You can add it again.`);
         continue;
       }
       if (this.queue.rows.length >= 100) {
-        this.notice(`${file.name}: лимит очереди — 100 файлов.`);
+        this.notice(`${file.name}: queue limit is 100 files.`);
         continue;
       }
       const row: Track = {
@@ -62,7 +60,7 @@ export class LocalImporter {
       };
       if (file.size > 250 * 1024 ** 2) {
         row.status = "failed";
-        row.error = "Файл превышает 250 МиБ.";
+        row.error = "File exceeds 250 MiB.";
       } else this.tasks.push(row);
       this.queue.add(row);
     }
@@ -72,7 +70,7 @@ export class LocalImporter {
   retry(row: Track) {
     if (row.status !== "failed") return;
     if (row.file.size > 250 * 1024 ** 2) {
-      this.notice("Файл превышает 250 МиБ.");
+      this.notice("File exceeds 250 MiB.");
       return;
     }
     this.release(row.url);
@@ -108,7 +106,7 @@ export class LocalImporter {
         }
         row.status = "failed";
         row.error =
-          error instanceof Error ? error.message : "Не удалось открыть файл.";
+          error instanceof Error ? error.message : "Could not open the file.";
         this.release(row.url);
         row.url = "";
         this.notice(`${row.file.name}: ${row.error}`);
@@ -141,23 +139,25 @@ export class LocalImporter {
       const loaded = () => {
         duration = this.probe.duration;
         if (!Number.isFinite(duration) || duration <= 0)
-          finish(new Error("Длительность файла неизвестна или равна нулю."));
+          finish(new Error("File duration is unknown or zero."));
         else finish();
       };
       const failed = () =>
         finish(
           new Error(
             this.probe.error?.code === 3
-              ? "Файл повреждён или не может быть декодирован."
-              : "Браузер не смог открыть формат. Попробуйте MP3 или PCM WAV.",
+              ? "File is damaged or cannot be decoded."
+              : "Browser could not open this format. Try MP3 or PCM WAV.",
           ),
         );
       const timer = setTimeout(
         () =>
-          finish(new Error("Подготовка превысила 10 секунд. Можно повторить.")),
+          finish(
+            new Error("Preparation timed out after 10 seconds. You can retry."),
+          ),
         10000,
       );
-      this.abort = () => finish(new Error("Импорт отменён."));
+      this.abort = () => finish(new Error("Import canceled."));
       this.probe.addEventListener("loadedmetadata", loaded);
       this.probe.addEventListener("error", failed);
       this.probe.src = url;

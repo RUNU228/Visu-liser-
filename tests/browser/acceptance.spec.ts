@@ -33,9 +33,7 @@ test("quad and 5.1 primary speaker downmix preserve expected channel energy", as
       .locator("input[type=file]")
       .first()
       .setInputFiles(`tests/fixtures/${file}`);
-    await page
-      .getByRole("button", { name: "Воспроизвести", exact: true })
-      .click();
+    await page.getByRole("button", { name: "Play", exact: true }).click();
     await expect
       .poll(async () => (await audio(page)).time)
       .toBeGreaterThan(2.1);
@@ -94,9 +92,7 @@ test("codec smoke: mandatory WAV16/WAV24/MP3 and optional codecs", async ({
       );
       continue;
     }
-    await page
-      .getByRole("button", { name: "Воспроизвести", exact: true })
-      .click();
+    await page.getByRole("button", { name: "Play", exact: true }).click();
     await expect
       .poll(async () => (await audio(page)).media)
       .toBeGreaterThan(0.15);
@@ -135,9 +131,7 @@ test("mono, anti-phase, silence, and multichannel downmix use actual samples", a
       .locator("input[type=file]")
       .first()
       .setInputFiles(`tests/fixtures/${file}`);
-    await page
-      .getByRole("button", { name: "Воспроизвести", exact: true })
-      .click();
+    await page.getByRole("button", { name: "Play", exact: true }).click();
     await expect
       .poll(async () => (await audio(page)).time)
       .toBeGreaterThan(0.2);
@@ -160,16 +154,14 @@ test("plot freeze, context interruption, rapid seeks and worker/worklet recovery
     .locator("input[type=file]")
     .first()
     .setInputFiles("tests/fixtures/long.wav");
-  await page
-    .getByRole("button", { name: "Воспроизвести", exact: true })
-    .click();
+  await page.getByRole("button", { name: "Play", exact: true }).click();
   await expect.poll(async () => (await audio(page)).time).toBeGreaterThan(0.2);
-  await page.getByRole("button", { name: "Заморозить", exact: true }).click();
+  await page.getByRole("button", { name: "Freeze", exact: true }).click();
   const frozen = await audio(page);
   await page.waitForTimeout(200);
   expect((await audio(page)).time).toBe(frozen.time);
   expect((await audio(page)).media).toBeGreaterThan(frozen.media);
-  await page.getByRole("button", { name: "Разморозить", exact: true }).click();
+  await page.getByRole("button", { name: "Unfreeze", exact: true }).click();
   await expect.poll(async () => (await audio(page)).capturing).toBe(true);
   await page.evaluate(async () => {
     const a = (window as any).visualizer.controller.audio;
@@ -182,9 +174,7 @@ test("plot freeze, context interruption, rapid seeks and worker/worklet recovery
       await (window as any).visualizer.controller.audio.context.suspend(),
   );
   await expect.poll(async () => (await audio(page)).capturing).toBe(false);
-  await page
-    .getByRole("button", { name: "Воспроизвести", exact: true })
-    .click();
+  await page.getByRole("button", { name: "Play", exact: true }).click();
   await expect.poll(async () => (await audio(page)).capturing).toBe(true);
   await page.evaluate(() =>
     (window as any).visualizer.controller.audio.worker.dispatchEvent(
@@ -234,13 +224,13 @@ test("layout linking, all-hidden, modal focus, and keyboard controls", async ({
   await page.setViewportSize({ width: 1440, height: 900 });
   await expect(page.locator(".workspace")).toHaveClass(/strip/);
   const before = await page.locator(".workspace").boundingBox();
-  await page.getByRole("button", { name: "Настройки", exact: true }).click();
+  await page.getByRole("button", { name: "Settings", exact: true }).click();
   expect(await page.locator(".workspace").boundingBox()).toEqual(before);
   await expect(page.getByRole("dialog")).toBeVisible();
   await page.keyboard.press("Escape");
   await expect(page.getByRole("dialog")).not.toBeVisible();
   await expect(
-    page.getByRole("button", { name: "Настройки", exact: true }),
+    page.getByRole("button", { name: "Settings", exact: true }),
   ).toBeFocused();
   await page.evaluate(() => {
     const c = (window as any).visualizer.controller;
@@ -249,8 +239,8 @@ test("layout linking, all-hidden, modal focus, and keyboard controls", async ({
       s.layout.enabled[key] = false;
     c.setSettings(s);
   });
-  await expect(page.getByText("Все визуализаторы скрыты")).toBeVisible();
-  await page.getByRole("button", { name: "Показать визуализаторы" }).click();
+  await expect(page.getByText("All visualizers are hidden")).toBeVisible();
+  await page.getByRole("button", { name: "Show visualizers" }).click();
   await expect(page.locator("canvas")).toHaveCount(5);
   await page.evaluate(() => {
     (document.activeElement as HTMLElement)?.blur();
@@ -275,7 +265,7 @@ test("duplicate, corrupt file, import cancel, and failed-only queue remain usabl
     )
     .toBe("failed");
   await expect(
-    page.getByRole("button", { name: "Воспроизвести", exact: true }),
+    page.getByRole("button", { name: "Play", exact: true }),
   ).toBeDisabled();
   await page
     .locator("input[type=file]")
@@ -286,11 +276,9 @@ test("duplicate, corrupt file, import cancel, and failed-only queue remain usabl
     .locator("input[type=file]")
     .first()
     .setInputFiles("tests/fixtures/stereo16.wav");
-  await page.getByRole("button", { name: /Очередь, 2/ }).click();
-  await expect(
-    page.getByRole("button", { name: "Добавить ещё раз" }),
-  ).toBeVisible();
-  await page.getByRole("button", { name: "Добавить ещё раз" }).click();
+  await page.getByRole("button", { name: /Queue, 2/ }).click();
+  await expect(page.getByRole("button", { name: "Add again" })).toBeVisible();
+  await page.getByRole("button", { name: "Add again" }).click();
   await expect
     .poll(() =>
       page.evaluate(
@@ -307,9 +295,7 @@ test("presets are atomic, preserve transport, and linked/max settings stay bound
     .locator("input[type=file]")
     .first()
     .setInputFiles("tests/fixtures/long.wav");
-  await page
-    .getByRole("button", { name: "Воспроизвести", exact: true })
-    .click();
+  await page.getByRole("button", { name: "Play", exact: true }).click();
   await expect.poll(async () => (await audio(page)).time).toBeGreaterThan(0.2);
   await page.evaluate(() => {
     const c = (window as any).visualizer.controller;
@@ -331,8 +317,8 @@ test("presets are atomic, preserve transport, and linked/max settings stay bound
   const before = await page.evaluate(() =>
     JSON.stringify((window as any).visualizer.controller.settings),
   );
-  await page.getByRole("button", { name: "Настройки", exact: true }).click();
-  await page.getByRole("button", { name: "Пресеты", exact: true }).click();
+  await page.getByRole("button", { name: "Settings", exact: true }).click();
+  await page.getByRole("button", { name: "Presets", exact: true }).click();
   await page.locator("dialog input[type=file]").setInputFiles({
     name: "invalid.json",
     mimeType: "application/json",
@@ -368,7 +354,7 @@ test("presets are atomic, preserve transport, and linked/max settings stay bound
     linked: false,
     fft: 4096,
   });
-  await page.getByRole("button", { name: "Закрыть панель" }).click();
+  await page.getByRole("button", { name: "Close panel" }).click();
   await page.setViewportSize({ width: 360, height: 800 });
   await page.screenshot({
     path: `docs/screenshots/${test.info().project.name}-playing-light-360.png`,
@@ -390,9 +376,7 @@ test("presets are atomic, preserve transport, and linked/max settings stay bound
     expect(target.width, target.name ?? "button").toBeGreaterThanOrEqual(44);
     expect(target.height, target.name ?? "button").toBeGreaterThanOrEqual(44);
   }
-  await page
-    .getByRole("button", { name: "Дополнительные параметры плеера" })
-    .click();
+  await page.getByRole("button", { name: "More player options" }).click();
   await expect(page.locator("#mobile-player-options")).toBeVisible();
   await page.keyboard.press("Escape");
   await expect(page.locator("#mobile-player-options")).not.toBeVisible();
@@ -407,9 +391,9 @@ test("unavailable settings storage and reduced motion do not break playback", as
   });
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/");
-  await page.getByRole("button", { name: "Тёмная тема" }).click();
+  await page.getByRole("button", { name: "Switch to dark theme" }).click();
   await expect(
-    page.getByRole("status").filter({ hasText: "не удалось сохранить" }),
+    page.getByRole("status").filter({ hasText: "could not be saved" }),
   ).toBeVisible();
   expect(
     await page.evaluate(
@@ -420,9 +404,7 @@ test("unavailable settings storage and reduced motion do not break playback", as
     .locator("input[type=file]")
     .first()
     .setInputFiles("tests/fixtures/stereo16.wav");
-  await page
-    .getByRole("button", { name: "Воспроизвести", exact: true })
-    .click();
+  await page.getByRole("button", { name: "Play", exact: true }).click();
   await expect.poll(async () => (await audio(page)).capturing).toBe(true);
   await page.screenshot({
     path: `docs/screenshots/${test.info().project.name}-playing-dark-1440.png`,

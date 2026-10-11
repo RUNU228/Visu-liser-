@@ -115,7 +115,7 @@ export class PlotRenderer {
     };
     this.plotHeight = rect.h;
     ctx.lineWidth = 1;
-    ctx.font = '11px "IBM Plex Mono", monospace';
+    ctx.font = '12px "IBM Plex Mono", monospace';
     ctx.fillStyle = c.ink;
     ctx.strokeStyle = c.ink;
     if (this.id === "spectrogram") this.spectrogram(c);
@@ -330,9 +330,9 @@ export class PlotRenderer {
       }
     if (config.labels) {
       if (vertical) {
-        this.label(c, "20 Гц", r.x, c.height - 10);
+        this.label(c, "20 Hz", r.x, c.height - 10);
         this.label(c, frequencyLabel(maxHz), r.x + r.w, c.height - 10, "right");
-        this.label(c, `−${duration.toFixed(1)}с`, 1, r.y + 11);
+        this.label(c, `−${duration.toFixed(1)}s`, 1, r.y + 11);
         this.label(c, "0", 20, r.y + r.h);
       } else {
         this.label(
@@ -345,8 +345,8 @@ export class PlotRenderer {
           "right",
         );
         this.label(c, "20", r.x - 5, r.y + r.h, "right");
-        this.label(c, `−${duration.toFixed(1)} с`, r.x, c.height - 10);
-        this.label(c, "сейчас", r.x + r.w, c.height - 10, "right");
+        this.label(c, `−${duration.toFixed(1)} s`, r.x, c.height - 10);
+        this.label(c, "now", r.x + r.w, c.height - 10, "right");
       }
     }
   }
@@ -480,8 +480,8 @@ export class PlotRenderer {
       }
       ctx.globalAlpha = 1;
     }
-    this.label(c, `−${duration.toFixed(1)} с`, r.x, c.height - 10);
-    this.label(c, "сейчас", r.x + r.w, c.height - 10, "right");
+    this.label(c, `−${duration.toFixed(1)} s`, r.x, c.height - 10);
+    this.label(c, "now", r.x + r.w, c.height - 10, "right");
   }
   private stereometer(c: RenderContext) {
     const { settings: s, store, rect: r, ctx } = c,
@@ -489,7 +489,7 @@ export class PlotRenderer {
     if (store.fallback) {
       this.label(
         c,
-        "Нужны синхронные L/R",
+        "Synchronized L/R required",
         r.x + r.w / 2,
         r.y + r.h / 2,
         "center",
@@ -760,7 +760,7 @@ export class PlotRenderer {
     if (frame.preparing) {
       this.label(
         c,
-        "Подготовка анализа",
+        "Preparing analysis",
         r.x + r.w / 2,
         r.y + r.h / 2 - 12,
         "center",
@@ -783,15 +783,15 @@ export class PlotRenderer {
     this.label(
       c,
       frame.frequency
-        ? `${s.oscilloscope.cycles} ${s.oscilloscope.cycles === 1 ? "период" : "периода"} · ${frame.frequency.toFixed(1)} Гц`
-        : `${(frame.duration * 1000).toFixed(1)} мс`,
+        ? `${s.oscilloscope.cycles} ${s.oscilloscope.cycles === 1 ? "cycle" : "cycles"} · ${frame.frequency.toFixed(1)} Hz`
+        : `${(frame.duration * 1000).toFixed(1)} ms`,
       r.x,
       c.height - 10,
     );
     if (!frame.frequency && s.oscilloscope.mode === "pitch")
-      this.label(c, "Тон не определён", r.x + r.w, c.height - 10, "right");
+      this.label(c, "Pitch unavailable", r.x + r.w, c.height - 10, "right");
     else if (!frame.locked && s.oscilloscope.trigger !== "off")
-      this.label(c, "Без синхронизации", r.x + r.w, c.height - 10, "right");
+      this.label(c, "Unsynchronized", r.x + r.w, c.height - 10, "right");
   }
   private spectrum(c: RenderContext) {
     const { rect: r, settings: s, store, ctx } = c,
@@ -860,14 +860,14 @@ export class PlotRenderer {
     if (config.style !== "bars") trace(values, 1);
     if (config.peaks) {
       trace(peaks, 0.55);
-      this.label(c, "Пики", r.x + r.w - 4, r.y + 12, "right");
+      this.label(c, "Peaks", r.x + r.w - 4, r.y + 12, "right");
     }
   }
   measure(u: number, v: number, s: Settings, store: AnalysisStore): string {
     const maxHz = Math.min(20000, store.sampleRate / 2);
     if (this.id === "spectrum") {
       const frame = store.spectrum;
-      if (!frame) return "Нет данных";
+      if (!frame) return "No data";
       const pixel = Math.min(
           this.spectrumPixels - 1,
           Math.max(0, Math.floor(u * this.spectrumPixels)),
@@ -880,7 +880,7 @@ export class PlotRenderer {
           this.spectrumPixels,
         ),
         raw = levelDb(bucket.power);
-      return `${frequencyLabel(bucket.low)}–${frequencyLabel(bucket.high)} · ${raw <= -160 ? "≤−160" : raw.toFixed(2)} dBFS${s.spectrum.tilt || s.analysis.trimDb ? ` · отображение ${(raw + s.analysis.trimDb + s.spectrum.tilt * Math.log2(bucket.frequency / 1000)).toFixed(2)} dB` : ""}${s.spectrum.note ? ` · ${noteLabel(bucket.frequency)}` : ""} · Δf ${(frame.sampleRate / frame.fftSize).toFixed(2)} Гц${bucket.interpolated ? " · интерполировано; разрешение не повышается" : " · максимум по FFT-бинам"}`;
+      return `${frequencyLabel(bucket.low)}–${frequencyLabel(bucket.high)} · ${raw <= -160 ? "≤−160" : raw.toFixed(2)} dBFS${s.spectrum.tilt || s.analysis.trimDb ? ` · display ${(raw + s.analysis.trimDb + s.spectrum.tilt * Math.log2(bucket.frequency / 1000)).toFixed(2)} dB` : ""}${s.spectrum.note ? ` · ${noteLabel(bucket.frequency)}` : ""} · Δf ${(frame.sampleRate / frame.fftSize).toFixed(2)} Hz${bucket.interpolated ? " · interpolated; resolution is unchanged" : " · maximum across FFT bins"}`;
     }
     if (this.id === "spectrogram") {
       const vertical = s.spectrogram.orientation === "vertical",
@@ -900,7 +900,7 @@ export class PlotRenderer {
         slice = store.spectrogram.find(
           (frame) => time >= frame.start && time <= frame.end,
         );
-      if (!slice) return "История недоступна";
+      if (!slice) return "History unavailable";
       let bucket = 0;
       while (
         bucket < slice.codes.length - 1 &&
@@ -946,13 +946,13 @@ export class PlotRenderer {
               ? "≥+160"
               : spectralDb(code).toFixed(2);
       const media = store.mediaTime(slice.time);
-      return `${frequencyLabel(slice.edges[bucket])}–${frequencyLabel(slice.edges[bucket + 1])} · ${db} dBFS · интервал ${(1000 * (slice.end - slice.start)).toFixed(1)} мс · −${(store.time - slice.time).toFixed(2)} с${media !== null ? " · ≈" + timeLabel(media) : ""}${slice.interpolated[bucket] ? " · интерполировано" : ""}`;
+      return `${frequencyLabel(slice.edges[bucket])}–${frequencyLabel(slice.edges[bucket + 1])} · ${db} dBFS · interval ${(1000 * (slice.end - slice.start)).toFixed(1)} ms · −${(store.time - slice.time).toFixed(2)} s${media !== null ? " · ≈" + timeLabel(media) : ""}${slice.interpolated[bucket] ? " · interpolated" : ""}`;
     }
     if (this.id === "waveform") {
       const { lanes, mainHeight, laneHeight } = waveLanes(s, this.plotHeight);
       const y = v * this.plotHeight;
       if (y >= mainHeight && s.waveform.bandHistory !== "off")
-        return "Частотная история · наведите курсор на основную дорожку для измерения";
+        return "Frequency history · point at the main lane to inspect";
       const duration = effectiveDuration(s, "waveform"),
         time = store.time - duration + u * duration,
         channel =
@@ -965,16 +965,16 @@ export class PlotRenderer {
           selected = bucket;
           break;
         }
-      if (!selected) return "История недоступна";
+      if (!selected) return "History unavailable";
       const stats = selected.channels[channel];
-      return `${store.fallback ? "Mono" : channel} · min ${stats.min.toFixed(4)} / max ${stats.max.toFixed(4)} · RMS ${Math.sqrt(stats.sumSquares / stats.count).toFixed(4)} · интервал ${(1000 * (selected.end - selected.start)).toFixed(1)} мс · −${(store.time - time).toFixed(2)} с`;
+      return `${store.fallback ? "Mono" : channel} · min ${stats.min.toFixed(4)} / max ${stats.max.toFixed(4)} · RMS ${Math.sqrt(stats.sumSquares / stats.count).toFixed(4)} · interval ${(1000 * (selected.end - selected.start)).toFixed(1)} ms · −${(store.time - time).toFixed(2)} s`;
     }
     if (this.id === "stereometer")
-      return `M=(L+R)/2 · S=(L−R)/2 · ρ=${store.stereometer?.correlation?.toFixed(3) ?? "—"} · усиление ${stereoGain(s, store.stereometer?.autoGain).toFixed(2)}×`;
+      return `M=(L+R)/2 · S=(L−R)/2 · ρ=${store.stereometer?.correlation?.toFixed(3) ?? "—"} · gain ${stereoGain(s, store.stereometer?.autoGain).toFixed(2)}×`;
     const frame = store.oscilloscope;
     return frame
-      ? `${(u * frame.duration * 1000).toFixed(2)} мс · ${frame.values[Math.min(frame.values.length - 1, Math.floor(u * frame.values.length))]?.toFixed(4) ?? "—"} · ${frame.frequency ? frame.frequency.toFixed(2) + " Гц · уверенность " + frame.confidence.toFixed(2) : "Тон не определён"}`
-      : "Нет данных";
+      ? `${(u * frame.duration * 1000).toFixed(2)} ms · ${frame.values[Math.min(frame.values.length - 1, Math.floor(u * frame.values.length))]?.toFixed(4) ?? "—"} · ${frame.frequency ? frame.frequency.toFixed(2) + " Hz · confidence " + frame.confidence.toFixed(2) : "Pitch unavailable"}`
+      : "No data";
   }
   destroy() {
     this.projected = new WeakMap();

@@ -35,7 +35,7 @@ await page.waitForFunction(
       (row) => row.status === "ready",
     ).length === 20,
 );
-await page.getByRole("button", { name: "Воспроизвести", exact: true }).click();
+await page.getByRole("button", { name: "Play", exact: true }).click();
 for (let i = 1; i < 20; i++) {
   await page.evaluate((index) => {
     const c = window.visualizer.controller;

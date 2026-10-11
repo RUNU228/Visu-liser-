@@ -557,7 +557,7 @@ describe("probe ownership", () => {
     expect(h.revoked).not.toHaveBeenCalled();
     await vi.advanceTimersByTimeAsync(1);
     expect(row.status).toBe("failed");
-    expect(row.error).toContain("10 секунд");
+    expect(row.error).toContain("10 seconds");
     expect(row.url).toBe("");
     expect(h.media.src).toBe("");
     expect(h.importer.urls.size).toBe(0);

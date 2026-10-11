@@ -11,12 +11,13 @@ export const names: Record<ModuleId, string> = {
   spectrum: "Spectrum",
 };
 const descriptions: Record<ModuleId, string> = {
-  spectrogram: "История частот и спектрального уровня сигнала.",
-  waveform: "Минимумы, максимумы и энергия звуковых отсчётов во времени.",
-  stereometer: "Синхронные левый и правый каналы, геометрия M/S и корреляция.",
+  spectrogram: "Frequency and spectral level history of the signal.",
+  waveform: "Minimum, maximum, and energy of audio samples over time.",
+  stereometer:
+    "Synchronized left and right channels, M/S geometry, and correlation.",
   oscilloscope:
-    "Короткое окно реального сигнала с триггером и определением тона.",
-  spectrum: "Текущий спектральный уровень в dBFS, частота в герцах.",
+    "Short window of the actual signal with triggering and pitch detection.",
+  spectrum: "Current spectral level in dBFS and frequency in hertz.",
 };
 export function Plot({
   id,
@@ -65,27 +66,28 @@ export function Plot({
           <h2>{names[id]}</h2>
           <span className="module-subtitle">
             {id === "spectrogram"
-              ? "ЧАСТОТА / ВРЕМЯ"
+              ? "Frequency / time"
               : id === "waveform"
-                ? "АМПЛИТУДА / ВРЕМЯ"
+                ? "Amplitude / time"
                 : id === "stereometer"
-                  ? "СТЕРЕОПОЛЕ"
+                  ? "Stereo field"
                   : id === "oscilloscope"
-                    ? "ФОРМА СИГНАЛА"
-                    : "ЧАСТОТА / УРОВЕНЬ"}
+                    ? "Signal shape"
+                    : "Frequency / level"}
           </span>
         </div>
         <div className="module-actions">
           <button
-            aria-label={`Настройки ${names[id]}`}
-            title="Настройки модуля"
+            aria-label={`Settings ${names[id]}`}
+            title={`Settings ${names[id]}`}
             onClick={onSettings}
           >
             <Icon name="settings" />
           </button>
           <button
-            aria-label={`${focus ? "Свернуть" : "Развернуть"} ${names[id]}`}
-            title="Фокус"
+            aria-label={`${focus ? "Collapse" : "Expand"} ${names[id]}`}
+            title={`${focus ? "Collapse" : "Expand"} ${names[id]}`}
+            aria-pressed={focus}
             onClick={onFocus}
           >
             <Icon name={focus ? "back" : "expand"} />
@@ -132,15 +134,15 @@ export function Plot({
         ) : null}
       </div>
       <p className="sr-only">
-        {descriptions[id]} Уровни измеряются до регулятора громкости.{" "}
+        {descriptions[id]} Levels are measured before the volume control.{" "}
         {id === "waveform"
-          ? `Текущий RMS: ${controller.audio.store.rms.toFixed(4)}.`
+          ? `Current RMS: ${controller.audio.store.rms.toFixed(4)}.`
           : id === "stereometer"
-            ? `Корреляция: ${controller.audio.store.stereometer?.correlation?.toFixed(3) ?? "не определена"}.`
+            ? `Correlation: ${controller.audio.store.stereometer?.correlation?.toFixed(3) ?? "unavailable"}.`
             : id === "oscilloscope"
-              ? `Основная частота: ${controller.audio.store.oscilloscope?.frequency?.toFixed(1) ?? "не определена"} Гц.`
-              : `Частота дискретизации ${controller.audio.store.sampleRate} Гц.`}{" "}
-        Наведите курсор или коснитесь графика для измерения.
+              ? `Fundamental frequency: ${controller.audio.store.oscilloscope?.frequency?.toFixed(1) ?? "unavailable"} Hz.`
+              : `Sample rate ${controller.audio.store.sampleRate} Hz.`}{" "}
+        Point at or touch the plot to inspect a measurement.
       </p>
     </section>
   );

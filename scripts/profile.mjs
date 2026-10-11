@@ -9,7 +9,7 @@ await page
   .locator("input[type=file]")
   .first()
   .setInputFiles("tests/fixtures/long.wav");
-await page.getByRole("button", { name: "Воспроизвести", exact: true }).click();
+await page.getByRole("button", { name: "Play", exact: true }).click();
 await page.waitForTimeout(8500);
 await page.evaluate(() => {
   window.profileTimes = {};
