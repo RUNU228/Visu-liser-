@@ -5,6 +5,7 @@ import {
   useSyncExternalStore,
   type CSSProperties,
 } from "react";
+import { Analytics } from "@vercel/analytics/react";
 import { AppController } from "./controller";
 import { RenderScheduler } from "../visualizers/scheduler";
 import { Plot } from "./Plot";
@@ -331,7 +332,7 @@ export function App({
               <span>
                 {c.audio.store.error}{" "}
                 {c.audio.store.fallback
-                  ? "Стереометр недоступен. Остальные графики: моно / Free / ограниченная история AnalyserNode."
+                  ? "Стереометр недоступен. Остальные ��рафики: моно / Free / ограниченная история AnalyserNode."
                   : ""}
               </span>
               <button onClick={() => void c.audio.retryAnalysis()}>
@@ -613,6 +614,7 @@ export function App({
           onRestore={() => setFocus(null)}
         />
       ) : null}
+      <Analytics />
     </>
   );
 }
