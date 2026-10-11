@@ -89,6 +89,7 @@ export interface Control {
   step?: number;
   unit?: string;
   options?: [string | number, string][];
+  values?: number[];
 }
 const n = (
   key: string,
@@ -180,7 +181,10 @@ export const controls: Record<string, Control[]> = {
     n("gamma", "Контраст γ", 0.5, 2, 0.1),
     b("grid", "Сетка"),
     b("labels", "Подписи краёв"),
-    n("fade", "Затухание истории", 0, 20, 1, "с · 0 выкл.; ≥2 до 1/e"),
+    {
+      ...n("fade", "Затухание истории", 0, 20, 1, "с · 0 выкл.; ≥2 до 1/e"),
+      values: [0, ...Array.from({ length: 19 }, (_, i) => i + 2)],
+    },
   ],
   waveform: [
     e("lane1", "Дорожка 1", channels),

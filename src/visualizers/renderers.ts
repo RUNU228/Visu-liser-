@@ -43,6 +43,24 @@ export interface Measurement {
   x: number;
   y: number;
 }
+function waveLanes(s: Settings, height: number) {
+  const lanes =
+    s.waveform.lane2 === "off"
+      ? [s.waveform.lane1]
+      : [s.waveform.lane1, s.waveform.lane2];
+  const mainHeight = Math.max(
+    0,
+    height - (s.waveform.bandHistory === "off" ? 0 : 28),
+  );
+  return { lanes, mainHeight, laneHeight: mainHeight / lanes.length };
+}
+function stereoGain(s: Settings, autoGain = 1) {
+  return (
+    s.stereometer.gain *
+    10 ** (s.analysis.trimDb / 20) *
+    (s.stereometer.geometry === "auto" ? autoGain : 1)
+  );
+}
 export class PlotRenderer {
   private raster = document.createElement("canvas");
   private pixels: ImageData | null = null;
@@ -52,6 +70,7 @@ export class PlotRenderer {
   >();
   private frequencyPixels = 0;
   private spectrumPixels = 1;
+  private plotHeight = 1;
   private intensityTable = new Float32Array(0);
   private intensityKey = "";
   private cells = new Float32Array(0);
@@ -94,6 +113,7 @@ export class PlotRenderer {
       muted: dark ? "#aaa" : "#606060",
       divider: dark ? "#383838" : "#d4d4d0",
     };
+    this.plotHeight = rect.h;
     ctx.lineWidth = 1;
     ctx.font = '11px "IBM Plex Mono", monospace';
     ctx.fillStyle = c.ink;
@@ -336,10 +356,7 @@ export class PlotRenderer {
     const duration = effectiveDuration(s, "waveform"),
       start = store.time - duration,
       gain = config.gain * 10 ** (s.analysis.trimDb / 20);
-    const lanes =
-      config.lane2 === "off" ? [config.lane1] : [config.lane1, config.lane2];
-    const bandSpace = config.bandHistory === "off" ? 0 : 28;
-    const laneHeight = (r.h - bandSpace) / lanes.length;
+    const { lanes, laneHeight } = waveLanes(s, r.h);
     lanes.forEach((channel, lane) => {
       const center = r.y + laneHeight * (lane + 0.5),
         half = laneHeight * 0.4;
@@ -485,10 +502,7 @@ export class PlotRenderer {
     const centerX = r.x + r.w / 2,
       centerY = r.y + r.h / 2,
       half = Math.min(r.w, r.h) * 0.43;
-    const gain =
-      config.gain *
-      10 ** (s.analysis.trimDb / 20) *
-      (config.geometry === "auto" ? frame.autoGain : 1);
+    const gain = stereoGain(s, frame.autoGain);
     if (config.grid) {
       this.line(c, centerX, r.y, centerX, r.y + r.h);
       this.line(c, r.x, centerY, r.x + r.w, centerY);
@@ -696,10 +710,30 @@ export class PlotRenderer {
     ctx.beginPath();
     if (values.length > width * 2) {
       const { mins, maxs } = scopeExtrema(values, width);
-      for (let x = 0; x < width; x++) {
-        ctx.moveTo(r.x + x, center - clamp(maxs[x] * gain, -1, 1) * half);
-        ctx.lineTo(r.x + x, center - clamp(mins[x] * gain, -1, 1) * half);
+      for (const edge of [maxs, mins]) {
+        for (let x = 0; x < width; x++) {
+          const y = center - clamp(edge[x] * gain, -1, 1) * half;
+          if (x) ctx.lineTo(r.x + x, y);
+          else ctx.moveTo(r.x + x, y);
+        }
       }
+      ctx.stroke();
+      if (s.oscilloscope.fill) {
+        ctx.beginPath();
+        for (let x = 0; x < width; x++) {
+          const y = center - clamp(maxs[x] * gain, 0, 1) * half;
+          if (x) ctx.lineTo(r.x + x, y);
+          else ctx.moveTo(r.x + x, y);
+        }
+        for (let x = width - 1; x >= 0; x--)
+          ctx.lineTo(r.x + x, center - clamp(mins[x] * gain, -1, 0) * half);
+        ctx.closePath();
+        ctx.globalAlpha = alpha * 0.06;
+        ctx.fillStyle = c.ink;
+        ctx.fill();
+      }
+      ctx.globalAlpha = 1;
+      return;
     } else
       for (let i = 0; i < values.length; i++) {
         const x = r.x + (i / Math.max(1, values.length - 1)) * r.w,
@@ -915,12 +949,16 @@ export class PlotRenderer {
       return `${frequencyLabel(slice.edges[bucket])}–${frequencyLabel(slice.edges[bucket + 1])} · ${db} dBFS · интервал ${(1000 * (slice.end - slice.start)).toFixed(1)} мс · −${(store.time - slice.time).toFixed(2)} с${media !== null ? " · ≈" + timeLabel(media) : ""}${slice.interpolated[bucket] ? " · интерполировано" : ""}`;
     }
     if (this.id === "waveform") {
+      const { lanes, mainHeight, laneHeight } = waveLanes(s, this.plotHeight);
+      const y = v * this.plotHeight;
+      if (y >= mainHeight && s.waveform.bandHistory !== "off")
+        return "Частотная история · наведите курсор на основную дорожку для измерения";
       const duration = effectiveDuration(s, "waveform"),
         time = store.time - duration + u * duration,
         channel =
-          s.waveform.lane2 === "off" || v < 0.5
-            ? s.waveform.lane1
-            : s.waveform.lane2;
+          lanes[
+            Math.min(lanes.length - 1, Math.floor(y / Math.max(1, laneHeight)))
+          ];
       let selected: WaveBucket | undefined;
       for (const bucket of store.waveform)
         if (time >= bucket.start && time <= bucket.end) {
@@ -932,7 +970,7 @@ export class PlotRenderer {
       return `${store.fallback ? "Mono" : channel} · min ${stats.min.toFixed(4)} / max ${stats.max.toFixed(4)} · RMS ${Math.sqrt(stats.sumSquares / stats.count).toFixed(4)} · интервал ${(1000 * (selected.end - selected.start)).toFixed(1)} мс · −${(store.time - time).toFixed(2)} с`;
     }
     if (this.id === "stereometer")
-      return `M=(L+R)/2 · S=(L−R)/2 · ρ=${store.stereometer?.correlation?.toFixed(3) ?? "—"} · усиление ${(store.stereometer?.autoGain ?? 1).toFixed(2)}×`;
+      return `M=(L+R)/2 · S=(L−R)/2 · ρ=${store.stereometer?.correlation?.toFixed(3) ?? "—"} · усиление ${stereoGain(s, store.stereometer?.autoGain).toFixed(2)}×`;
     const frame = store.oscilloscope;
     return frame
       ? `${(u * frame.duration * 1000).toFixed(2)} мс · ${frame.values[Math.min(frame.values.length - 1, Math.floor(u * frame.values.length))]?.toFixed(4) ?? "—"} · ${frame.frequency ? frame.frequency.toFixed(2) + " Гц · уверенность " + frame.confidence.toFixed(2) : "Тон не определён"}`

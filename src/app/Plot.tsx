@@ -3,7 +3,6 @@ import type { ModuleId } from "../shared/types";
 import type { AppController } from "./controller";
 import type { RenderScheduler } from "../visualizers/scheduler";
 import { Icon } from "./icons";
-import { PlotRenderer } from "../visualizers/renderers";
 export const names: Record<ModuleId, string> = {
   spectrogram: "Spectrogram",
   waveform: "Waveform",
@@ -34,27 +33,25 @@ export function Plot({
   onFocus: () => void;
   onSettings: () => void;
 }) {
-  const canvas = useRef<HTMLCanvasElement>(null),
-    inspector = useRef<PlotRenderer | null>(null);
+  const canvas = useRef<HTMLCanvasElement>(null);
   const [tooltip, setTooltip] = useState("");
   const [pin, setPin] = useState(false);
   useEffect(() => {
     if (!canvas.current) return;
-    inspector.current = new PlotRenderer(id);
     const unregister = scheduler.register(id, canvas.current);
-    return () => {
-      unregister();
-      inspector.current?.destroy();
-    };
+    return unregister;
   }, [id, scheduler]);
+  useEffect(() => {
+    setPin(false);
+    setTooltip("");
+  }, [id, controller.audio.store.resetVersions[id], controller.settings]);
   const inspect = (clientX: number, clientY: number) => {
     const box = canvas.current!.getBoundingClientRect();
     setTooltip(
-      inspector.current!.measure(
+      scheduler.measure(
+        id,
         Math.max(0, Math.min(1, (clientX - box.left - 36) / (box.width - 48))),
         Math.max(0, Math.min(1, (clientY - box.top - 10) / (box.height - 38))),
-        controller.settings,
-        controller.audio.store,
       ),
     );
   };

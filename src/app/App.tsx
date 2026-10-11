@@ -50,7 +50,7 @@ export function App({
   const s = c.settings,
     active = c.queue.active;
   const visible = s.layout.order.filter((id) => s.layout.enabled[id]);
-  const strip = s.layout.requested === "strip" && width >= 1440;
+  const strip = s.layout.requested === "strip" && width >= 1440 && !focus;
   const elapsed = seekPreview ?? c.audio.media.currentTime;
   const duration = active?.duration ?? 0;
   useEffect(() => {
@@ -525,6 +525,15 @@ export function App({
             <span role="status" aria-live="polite">
               {c.message}
             </span>
+            {c.messageDismissible ? (
+              <button
+                className="text-action"
+                aria-label="Скрыть уведомление"
+                onClick={() => c.dismissNotice()}
+              >
+                Скрыть
+              </button>
+            ) : null}
             {c.undo ? (
               <button className="text-action" onClick={() => c.restoreUndo()}>
                 Отменить очистку
@@ -598,6 +607,7 @@ export function App({
       ) : panel === "settings" ? (
         <SettingsPanel
           controller={c}
+          scheduler={scheduler}
           group={group}
           onClose={() => setPanel(null)}
           onRestore={() => setFocus(null)}

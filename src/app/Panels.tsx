@@ -13,6 +13,7 @@ import { MODULES, type ModuleId, type Settings } from "../shared/types";
 import { timeLabel } from "../shared/units";
 import { Icon } from "./icons";
 import { names } from "./Plot";
+import type { RenderScheduler } from "../visualizers/scheduler";
 const transportNames = {
   empty: "Пусто",
   ready: "Готово",
@@ -28,12 +29,14 @@ export function ModalPanel({
   children,
   onClose,
   message,
+  onDismiss,
   transport,
 }: {
   title: string;
   children: ReactNode;
   onClose: () => void;
   message?: string;
+  onDismiss?: () => void;
   transport?: string;
 }) {
   const ref = useRef<HTMLDialogElement>(null);
@@ -91,6 +94,15 @@ export function ModalPanel({
           aria-atomic="true"
         >
           {message}
+          {message && onDismiss ? (
+            <button
+              className="text-action"
+              aria-label="Скрыть уведомление"
+              onClick={onDismiss}
+            >
+              Скрыть
+            </button>
+          ) : null}
         </p>
         {children}
       </div>
@@ -110,6 +122,7 @@ export function QueuePanel({
       title={`Очередь · ${c.queue.rows.length}`}
       onClose={onClose}
       message={c.message}
+      onDismiss={c.messageDismissible ? () => c.dismissNotice() : undefined}
       transport={`${c.queue.active?.title ?? "Дорожка не выбрана"} · ${transportNames[c.audio.state]}`}
     >
       <p className="panel-help">
@@ -234,7 +247,8 @@ export function QueuePanel({
           <button
             onClick={() => {
               c.importer.duplicates.splice(index, 1);
-              c.emit();
+              if (!c.importer.duplicates.length) c.dismissNotice();
+              else c.emit();
             }}
           >
             Пропустить
@@ -268,6 +282,13 @@ function Field({
   onChange: (value: unknown) => void;
 }) {
   const id = useId();
+  // Keep accepted fractional import values in the discrete control until edited.
+  const sliderValues =
+    control.values &&
+    typeof value === "number" &&
+    !control.values.includes(value)
+      ? [...control.values, value].sort((a, b) => a - b)
+      : control.values;
   if (control.kind === "boolean")
     return (
       <label className={`check-field${disabled ? " field-disabled" : ""}`}>
@@ -310,13 +331,22 @@ function Field({
           <input
             id={id}
             type="range"
-            min={control.min}
-            max={control.max}
-            step={control.step}
-            value={value as number}
+            min={sliderValues ? 0 : control.min}
+            max={sliderValues ? sliderValues.length - 1 : control.max}
+            step={sliderValues ? 1 : control.step}
+            value={
+              sliderValues
+                ? sliderValues.indexOf(value as number)
+                : (value as number)
+            }
             aria-valuetext={`${value} ${control.unit}`}
             disabled={disabled}
-            onChange={(event) => onChange(Number(event.target.value))}
+            onChange={(event) =>
+              onChange(
+                sliderValues?.[Number(event.target.value)] ??
+                  Number(event.target.value),
+              )
+            }
           />
         </>
       )}
@@ -325,11 +355,13 @@ function Field({
 }
 export function SettingsPanel({
   controller: c,
+  scheduler,
   group,
   onClose,
   onRestore,
 }: {
   controller: AppController;
+  scheduler: RenderScheduler;
   group: string;
   onClose: () => void;
   onRestore: () => void;
@@ -355,11 +387,13 @@ export function SettingsPanel({
     c.setSettings(next);
   };
   const diagnostic = c.audio.diagnostics;
+  const effective = scheduler.effective;
   return (
     <ModalPanel
       title="Настройки"
       onClose={onClose}
       message={c.message}
+      onDismiss={c.messageDismissible ? () => c.dismissNotice() : undefined}
       transport={`${c.queue.active?.title ?? "Дорожка не выбрана"} · ${transportNames[c.audio.state]}`}
     >
       <div ref={section}>
@@ -513,6 +547,21 @@ export function SettingsPanel({
             ) : null}
             {section === "performance" ? (
               <div className="diagnostics">
+                <p>
+                  Целевая частота: {effective.fps} FPS
+                  <br />
+                  Эффективный DPR: {effective.dpr}
+                  <br />
+                  {effective.reasons.join(" · ")}
+                  <br />
+                  Измеренная частота:{" "}
+                  {diagnostic.fps
+                    ? `${diagnostic.fps.toFixed(1)} FPS`
+                    : "нет данных"}
+                  <br />
+                  Перерисовка без новых данных p95:{" "}
+                  {diagnostic.idleRenderP95.toFixed(1)} мс
+                </p>
                 <p>
                   Авто: 60 FPS на компьютере, 30 FPS на мобильном. Экономный
                   режим: 30 FPS / DPR ≤1.5.

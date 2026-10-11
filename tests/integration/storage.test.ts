@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
-import { SettingsStorage } from "../../src/settings/storage";
+import { SettingsStorage, parsePreset } from "../../src/settings/storage";
 import { defaults } from "../../src/settings/schema";
 afterEach(() => vi.unstubAllGlobals());
 function local() {
@@ -11,6 +11,9 @@ function local() {
   return map;
 }
 describe("durable settings", () => {
+  it("reports malformed imported JSON in Russian", () => {
+    expect(() => parsePreset("{")).toThrow(/Неверный JSON/);
+  });
   it("restores every successfully saved user preset", () => {
     local();
     const storage = new SettingsStorage(() => {});

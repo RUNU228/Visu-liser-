@@ -20,11 +20,12 @@ export class RenderScheduler {
     if (document.hidden) {
       cancelAnimationFrame(this.raf);
       this.raf = 0;
-      this.audio.store.lastRender = 0;
+      this.audio.store.resetTiming();
     } else this.start();
   };
   private resize = () => {
     this.dirty = true;
+    this.audio.store.resetTiming(true);
     this.audio.configure(this.audio.store.settings);
   };
   register(id: ModuleId, canvas: HTMLCanvasElement) {
@@ -51,6 +52,16 @@ export class RenderScheduler {
   invalidate() {
     this.dirty = true;
   }
+  measure(id: ModuleId, u: number, v: number) {
+    const entry = this.plots.get(id);
+    if (!entry) return "Нет данных";
+    return entry.renderer.measure(
+      u,
+      v,
+      this.audio.store.settings,
+      this.audio.store,
+    );
+  }
   get effective() {
     const s = this.audio.store.settings,
       mobile = innerWidth < 768 || matchMedia("(pointer: coarse)").matches;
@@ -67,6 +78,13 @@ export class RenderScheduler {
         s.performance.dpr,
         mobile || s.performance.economy ? 1.5 : 2,
       ),
+      reasons: [
+        ...(s.performance.economy
+          ? ["экономный режим: 30 FPS / DPR ≤1.5"]
+          : []),
+        ...(mobile ? ["мобильное устройство: Авто 30 FPS / DPR ≤1.5"] : []),
+        `DPR устройства: ${devicePixelRatio || 1}; предел настройки: ${s.performance.dpr}`,
+      ],
     };
   }
   private start() {
@@ -83,14 +101,17 @@ export class RenderScheduler {
       const store = this.audio.store;
       if (this.dirty || store.version !== this.storeVersion) {
         const started = performance.now();
+        let rendered = false;
         for (const [id, entry] of this.plots) {
           if (!entry.visible || (this.focus && id !== this.focus)) continue;
           entry.renderer.render(entry.canvas, store.settings, store, dpr);
+          rendered = true;
         }
         this.audio.store.recordRender(
           this.audio.context,
           now,
           performance.now() - started,
+          rendered && this.audio.liveCapture,
         );
         this.storeVersion = store.version;
         this.dirty = false;

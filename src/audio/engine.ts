@@ -525,6 +525,7 @@ export class AudioEngine {
   private closeGate(): Promise<void> {
     const was = this.capturing || this.opening;
     this.capturing = false;
+    this.store.resetTiming();
     this.opening = false;
     this.gateGeneration++;
     if (this.closing) return this.closing;
@@ -583,6 +584,7 @@ export class AudioEngine {
       });
       if (this.store.maps.length > 1000) this.store.maps.shift();
       this.lastWorkerResult = performance.now();
+      this.store.resetTiming(true);
       this.capturing = true;
       this.opening = false;
     } catch {
@@ -609,6 +611,12 @@ export class AudioEngine {
   }
   configure(settings: Settings) {
     const previous = this.store.settings;
+    let timingChanged =
+      JSON.stringify(previous.performance) !==
+        JSON.stringify(settings.performance) ||
+      MODULES.some(
+        (id) => previous.layout.enabled[id] !== settings.layout.enabled[id],
+      );
     const changed = (id: ModuleId, keys: string[]) =>
       keys.some(
         (key) =>
@@ -634,10 +642,12 @@ export class AudioEngine {
           "windowMs",
         ]);
       if (numerical) {
+        timingChanged = true;
         this.store.revisions[id]++;
         this.store.clear(id);
       }
     }
+    if (timingChanged) this.store.resetTiming(true);
     this.store.settings = settings;
     this.configureWorker();
     void this.updateGate();
@@ -816,6 +826,7 @@ export class AudioEngine {
   }
   private bypass() {
     this.capturing = false;
+    this.store.resetTiming();
     this.opening = false;
     this.gateGeneration++;
     this.source?.disconnect();
@@ -1066,6 +1077,9 @@ export class AudioEngine {
   private stopFallback() {
     if (this.fallbackTimer) clearInterval(this.fallbackTimer);
     this.fallbackTimer = undefined;
+  }
+  get liveCapture() {
+    return this.capturing && this.eligible();
   }
   get diagnostics() {
     return {

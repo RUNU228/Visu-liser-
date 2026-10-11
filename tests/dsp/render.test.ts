@@ -18,8 +18,14 @@ import { PlotRenderer } from "../../src/visualizers/renderers";
 import { encodeDb } from "../../src/analysis/dsp";
 function canvas(width = 88, height = 100) {
   let image: ImageData | undefined;
+  const fill = vi.fn();
+  const moveTo = vi.fn();
+  const lineTo = vi.fn();
   const context = new Proxy(
     {
+      fill,
+      moveTo,
+      lineTo,
       createImageData: (w: number, h: number) => ({
         width: w,
         height: h,
@@ -43,6 +49,9 @@ function canvas(width = 88, height = 100) {
       getContext: () => context,
     } as unknown as HTMLCanvasElement,
     image: () => image,
+    fill,
+    moveTo,
+    lineTo,
   };
 }
 const scope = (frame: number, time: number): ScopeFrame => ({
@@ -225,6 +234,71 @@ describe("sample-time and pixel geometry", () => {
   });
 });
 describe("rendered measurement fidelity", () => {
+  it.each(["off", "fast", "slow"] as const)(
+    "measures Waveform lanes using rendered boundaries with %s bands",
+    (bandHistory) => {
+      const target = canvas(448, 200),
+        s = defaults();
+      s.waveform.lane1 = "S";
+      s.waveform.lane2 = "M";
+      s.waveform.bandHistory = bandHistory;
+      const store = new AnalysisStore(s);
+      store.time = 8;
+      store.waveform = [bucket(0, 8)];
+      const renderer = new PlotRenderer("waveform");
+      renderer.render(target.element, s, store, 1);
+      const boundary = bandHistory === "off" ? 0.5 : 67 / 162;
+      expect(renderer.measure(0.55, boundary - 0.001, s, store)).toMatch(
+        /^S ·/,
+      );
+      expect(renderer.measure(0.55, boundary + 0.001, s, store)).toMatch(
+        /^M ·/,
+      );
+      if (bandHistory !== "off")
+        expect(renderer.measure(0.55, 0.99, s, store)).not.toMatch(/^(S|M) ·/);
+    },
+  );
+  it.each(["ms", "lr", "auto"] as const)(
+    "reports applied Stereometer gain for %s geometry",
+    (geometry) => {
+      canvas();
+      const s = defaults();
+      s.stereometer.geometry = geometry;
+      s.stereometer.gain = 2;
+      s.analysis.trimDb = 6;
+      const store = new AnalysisStore(s);
+      store.accept(result(48000, 1));
+      store.stereometer!.autoGain = 1.5;
+      const text = new PlotRenderer("stereometer").measure(0.5, 0.5, s, store);
+      expect(text).toContain(
+        `усиление ${geometry === "auto" ? "5.99" : "3.99"}×`,
+      );
+    },
+  );
+  it.each([
+    [360, 240],
+    [900, 4800],
+    [360, 4800],
+  ])(
+    "fills a %i px scope with %i samples only when enabled",
+    (width, samples) => {
+      const target = canvas(width, 200),
+        s = defaults(),
+        store = new AnalysisStore(s);
+      store.accept(result(48000, 1));
+      store.oscilloscope!.values = Float32Array.from(
+        { length: samples },
+        (_, i) => Math.sin(i * 0.2) * 0.5,
+      );
+      const renderer = new PlotRenderer("oscilloscope");
+      s.oscilloscope.fill = false;
+      renderer.render(target.element, s, store, 1);
+      expect(target.fill).not.toHaveBeenCalled();
+      s.oscilloscope.fill = true;
+      renderer.render(target.element, s, store, 1);
+      expect(target.fill).toHaveBeenCalledOnce();
+    },
+  );
   const slice = (time: number, level: number) => ({
     time,
     start: time - 0.02,
@@ -313,5 +387,39 @@ describe("rendered measurement fidelity", () => {
     renderer.render(target.element, s, store, 1);
     expect(target.image()!.data[0]).toBeLessThan(240);
     expect(retained.codes).toEqual(original);
+  });
+});
+
+describe("current signal and live telemetry", () => {
+  it("resets current RMS only on a full signal clear", () => {
+    const store = new AnalysisStore(defaults());
+    store.accept(result(48000, 1));
+    store.clear("spectrum");
+    expect(store.rms).toBe(0.2);
+    store.clear();
+    expect(store.rms).toBe(0);
+  });
+  it("excludes idle redraws and samples each active frame once", () => {
+    const store = new AnalysisStore(defaults());
+    const context = { currentTime: 1.03, sampleRate: 48000 } as AudioContext;
+    store.accept(result(48000, 1));
+    store.recordRender(context, 100, 3, true);
+    store.recordRender(context, 116, 3, true);
+    expect(store.latency).toHaveLength(1);
+    context.currentTime = 20;
+    store.recordRender(context, 20000, 2, false);
+    expect(store.latency).toHaveLength(1);
+    expect(store.renderTimes).toEqual([3]);
+    expect(store.frameTimes).toEqual([]);
+    store.accept(result(960000, 20));
+    store.recordRender(context, 20016, 3, true);
+    expect(store.frameTimes).toEqual([]);
+    context.currentTime = 20.016;
+    store.accept(result(960768, 20.016));
+    store.recordRender(context, 20032, 4, true);
+    expect(store.frameTimes).toEqual([16]);
+  });
+  it("reports no observed FPS before two eligible fresh renders", () => {
+    expect(new AnalysisStore(defaults()).diagnostics().fps).toBe(0);
   });
 });

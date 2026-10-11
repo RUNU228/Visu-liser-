@@ -11,7 +11,14 @@ export class AppController {
   readonly storage: SettingsStorage;
   settings: Settings;
   presets: UserPreset[];
-  message = "";
+  private transientMessage = "";
+  private durableMessage = "";
+  get message() {
+    return this.transientMessage || this.durableMessage;
+  }
+  get messageDismissible() {
+    return !!this.transientMessage;
+  }
   version = 0;
   listeners = new Set<() => void>();
   undo: { snapshot: QueueSnapshot; position: number; deadline: number } | null =
@@ -19,7 +26,9 @@ export class AppController {
   private undoTimer: ReturnType<typeof setTimeout> | null = null;
   private suppress = false;
   constructor() {
-    this.storage = new SettingsStorage((text) => this.notify(text));
+    this.storage = new SettingsStorage((text) =>
+      this.notify(text, this.storage.failed),
+    );
     const persisted = this.storage.load();
     this.settings = persisted.settings;
     this.presets = persisted.presets;
@@ -57,14 +66,21 @@ export class AppController {
     this.version++;
     this.listeners.forEach((listener) => listener());
   }
-  notify(text: string) {
-    if (this.message === text) return;
-    this.message = text;
+  notify(text: string, durable = false) {
+    if (durable ? this.durableMessage === text : this.transientMessage === text)
+      return;
+    if (durable) this.durableMessage = text;
+    else this.transientMessage = text;
+    this.emit();
+  }
+  dismissNotice() {
+    this.transientMessage = "";
     this.emit();
   }
   setSettings(input: unknown) {
     try {
       const settings = validateSettings(input);
+      this.dismissNotice();
       this.audio.configure(settings);
       this.settings = settings;
       this.storage.save(settings, this.presets);
@@ -104,6 +120,7 @@ export class AppController {
     this.emit();
   }
   add(files: File[], again = false) {
+    this.dismissNotice();
     this.finalizeUndo();
     this.importer.add(files, again);
   }
@@ -158,6 +175,7 @@ export class AppController {
   async remove(id: string) {
     const row = this.queue.rows.find((t) => t.id === id);
     if (!row) return;
+    this.dismissNotice();
     const wasActive = this.queue.activeId === id;
     this.queue.remove(id);
     if (wasActive) {
@@ -168,6 +186,7 @@ export class AppController {
     this.emit();
   }
   clear() {
+    this.dismissNotice();
     this.finalizeUndo();
     this.suppress = true;
     this.importer.cancel();

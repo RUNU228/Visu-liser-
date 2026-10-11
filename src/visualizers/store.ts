@@ -40,6 +40,10 @@ export class AnalysisStore {
     ModuleId,
     number
   >;
+  resetVersions = Object.fromEntries(MODULES.map((id) => [id, 0])) as Record<
+    ModuleId,
+    number
+  >;
   private waveHead = 0;
   private spectralHead = 0;
   private edges: Float32Array | null = null;
@@ -48,13 +52,17 @@ export class AnalysisStore {
   centerAge: number[] = [];
   frameTimes: number[] = [];
   renderTimes: number[] = [];
+  idleRenderTimes: number[] = [];
   lastRender = 0;
+  private measuredFrame = -1;
+  private measuredCenter = -1;
   error = "";
   fallback = false;
   constructor(settings: Settings) {
     this.settings = settings;
   }
   clear(id?: ModuleId) {
+    for (const module of id ? [id] : MODULES) this.resetVersions[module]++;
     if (!id || id === "waveform") {
       this.waveform = [];
       this.waveHead = 0;
@@ -82,6 +90,8 @@ export class AnalysisStore {
       this.time = 0;
       this.latestFrame = 0;
       this.maps = [];
+      this.rms = 0;
+      this.resetTiming(true);
     }
     this.version++;
   }
@@ -209,11 +219,35 @@ export class AnalysisStore {
     }
     return map ? map.media + (time - map.time) * map.rate : null;
   }
+  resetTiming(clearSamples = false) {
+    this.lastRender = 0;
+    this.measuredFrame = this.latestFrame;
+    this.measuredCenter = this.spectrum?.centerFrame ?? -1;
+    if (clearSamples) {
+      this.latency = [];
+      this.centerAge = [];
+      this.frameTimes = [];
+      this.renderTimes = [];
+    }
+  }
   recordRender(
     context: AudioContext | undefined,
     now: number,
     duration: number,
+    active = false,
   ) {
+    if (
+      !active ||
+      !context ||
+      !this.latestFrame ||
+      this.latestFrame === this.measuredFrame
+    ) {
+      this.idleRenderTimes.push(duration);
+      if (this.idleRenderTimes.length > 7200) this.idleRenderTimes.shift();
+      if (!active) this.lastRender = 0;
+      return;
+    }
+    this.measuredFrame = this.latestFrame;
     if (this.lastRender) this.frameTimes.push(now - this.lastRender);
     this.lastRender = now;
     this.renderTimes.push(duration);
@@ -224,7 +258,8 @@ export class AnalysisStore {
           (context.currentTime - this.latestFrame / context.sampleRate) * 1000,
         ),
       );
-      if (this.spectrum)
+      if (this.spectrum && this.spectrum.centerFrame !== this.measuredCenter) {
+        this.measuredCenter = this.spectrum.centerFrame;
         this.centerAge.push(
           Math.max(
             0,
@@ -233,6 +268,7 @@ export class AnalysisStore {
               1000,
           ),
         );
+      }
     }
     for (const values of [
       this.latency,
@@ -263,8 +299,9 @@ export class AnalysisStore {
       latencyP95: percentile(this.latency, 0.95),
       latencyMax: percentile(this.latency, 1),
       centerAgeP95: percentile(this.centerAge, 0.95),
-      fps: 1000 / (percentile(this.frameTimes, 0.5) || 1),
+      fps: this.frameTimes.length ? 1000 / percentile(this.frameTimes, 0.5) : 0,
       renderP95: percentile(this.renderTimes, 0.95),
+      idleRenderP95: percentile(this.idleRenderTimes, 0.95),
       samples: this.latency.length,
     };
   }

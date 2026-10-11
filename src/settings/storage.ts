@@ -64,7 +64,15 @@ export class SettingsStorage {
 export function parsePreset(text: string) {
   if (new Blob([text]).size > 65536)
     throw new Error("Файл настроек превышает 64 КиБ.");
-  return validateSettings(JSON.parse(text));
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(text);
+  } catch (error) {
+    if (error instanceof SyntaxError)
+      throw new Error("Неверный JSON. Проверьте синтаксис файла настроек.");
+    throw error;
+  }
+  return validateSettings(parsed);
 }
 export function exportPreset(settings: Settings, name = "Visu@lizer") {
   const url = URL.createObjectURL(
